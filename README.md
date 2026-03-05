@@ -1,2 +1,2 @@
-The first commit of this beautifasfhdasklfhskhfksafful new project
-A full heal visualizer using wasm and react
+The first commit of this new project.
+A full heap visualizer using WASM and React.
