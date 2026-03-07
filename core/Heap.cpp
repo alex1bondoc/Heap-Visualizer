@@ -52,24 +52,20 @@ public:
     }
     MemoryBlock *myRealloc(MemoryBlock *block, int size) {
         size = (size + 7) & ~7;
-
-        if (block->GetSize() >= size) {
-            return block;
+        if (block == nullptr) {
+            return myMalloc(size);
         }
-        MemoryBlock *aux = head;
-        MemoryBlock *best_fit = nullptr;
-        while (aux != nullptr) {
-            if (aux->GetSize() >= size && aux->GetStatus() == Status::FREE) {
-                if (aux->GetSize() < best_fit->GetSize()) {
-                    best_fit = aux;
-                }
-            }
-        }
-        if (best_fit == nullptr) {
+        if (size == 0) {
+            myFree(block);
             return nullptr;
         }
-        best_fit = best_fit->SplitBlock(size);
-        return best_fit;
+        if (size <= block->GetSize()) {
+            return block->SplitBlock(size);
+        }
+        else{
+            return nullptr;
+        }
+        return nullptr;
     }
     void myFree(MemoryBlock *block) {
         if (block == nullptr) {
