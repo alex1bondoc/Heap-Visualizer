@@ -71,4 +71,10 @@ public:
         best_fit = best_fit->SplitBlock(size);
         return best_fit;
     }
+    void myFree(MemoryBlock *block) {
+        if (block == nullptr) {
+            return;
+        }
+
+    }
 };
