@@ -17,14 +17,15 @@ public:
     MemoryBlock *myMalloc(int size) {
         size = (size + 7) & ~7;
 
-        MemoryBlock *aux = head;
+        MemoryBlock *aux = this->getHead();
         MemoryBlock *best_fit = nullptr;
         while (aux != nullptr) {
             if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-                if (aux->getSize() < best_fit->getSize()) {
+                if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
                     best_fit = aux;
                 }
             }
+            aux = aux->getNext();
         }
         if (best_fit == nullptr) {
             return nullptr;

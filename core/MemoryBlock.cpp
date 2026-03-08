@@ -35,11 +35,14 @@ public:
 
     MemoryBlock *SplitBlock(int size) { 
         MemoryBlock *aux = new MemoryBlock(this->getSize() - size, Status::FREE);
-        this->setSize(this->getSize() - size);
+        this->setSize(size);
         this->setStatus(Status::ALLOC);
         MemoryBlock *next = this->getNext();
         this->setNext(aux);
         aux->setPrev(this);
+        if (next != nullptr) {
+            next->setPrev(aux);
+        }
         aux->setNext(next);
         return this;
     }
