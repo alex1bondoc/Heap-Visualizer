@@ -59,4 +59,13 @@ public:
         }
     }
 
+    void mergeNext() {
+        this->SetSize(this->GetSize() + this->GetNext()->GetSize());
+        this->GetNext()->RemoveCurrent();
+    }
+
+    void mergePrev() {
+        this->SetSize(this->GetSize() + this->GetPrev()->GetSize());
+        this->GetPrev()->RemoveCurrent();
+    }
 };

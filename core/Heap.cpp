@@ -96,6 +96,12 @@ public:
         if (block == nullptr) {
             return;
         }
-        
+        block->SetStatus(Status::FREE);
+        if (block->GetNext()->GetStatus() == Status::FREE) {
+            block->mergeNext();
+        }
+        if (block->GetPrev()->GetStatus() == Status::FREE) {
+            block->mergePrev();
+        }
     }
 };
