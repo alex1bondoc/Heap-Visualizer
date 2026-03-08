@@ -8,11 +8,11 @@ private:
 public:
     Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
 
-    MemoryBlock *GetHead() { return head; }
-    int GetSize() { return size; }
+    MemoryBlock *getHead() { return head; }
+    int getSize() { return size; }
 
-    void SetHead(MemoryBlock *head) { this->head = head; }
-    void SetSize(int size) { this->size = (size + 7) & ~7; }
+    void setHead(MemoryBlock *head) { this->head = head; }
+    void setSize(int size) { this->size = (size + 7) & ~7; }
 
     MemoryBlock *myMalloc(int size) {
         size = (size + 7) & ~7;
@@ -20,8 +20,8 @@ public:
         MemoryBlock *aux = head;
         MemoryBlock *best_fit = nullptr;
         while (aux != nullptr) {
-            if (aux->GetSize() >= size && aux->GetStatus() == Status::FREE) {
-                if (aux->GetSize() < best_fit->GetSize()) {
+            if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
+                if (aux->getSize() < best_fit->getSize()) {
                     best_fit = aux;
                 }
             }
@@ -38,8 +38,8 @@ public:
         MemoryBlock *aux = head;
         MemoryBlock *best_fit = nullptr;
         while (aux != nullptr) {
-            if (aux->GetSize() >= size && aux->GetStatus() == Status::FREE) {
-                if (aux->GetSize() < best_fit->GetSize()) {
+            if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
+                if (aux->getSize() < best_fit->getSize()) {
                     best_fit = aux;
                 }
             }
@@ -59,26 +59,26 @@ public:
             myFree(block);
             return nullptr;
         }
-        if (size <= block->GetSize()) {
+        if (size <= block->getSize()) {
             return block->SplitBlock(size);
         }
         else{
-            MemoryBlock *next = block->GetNext();
-            MemoryBlock *prev = block->GetPrev();
-            if (next->GetStatus() == Status::FREE && block->GetSize() + next->GetSize() > size) {
-                block->joinNext(size - block->GetSize());
+            MemoryBlock *next = block->getNext();
+            MemoryBlock *prev = block->getPrev();
+            if (next->getStatus() == Status::FREE && block->getSize() + next->getSize() > size) {
+                block->joinNext(size - block->getSize());
             }
-            else if(prev->GetStatus() == Status::FREE && block->GetSize() + prev->GetSize() > size) {
-                block->joinPrev(size - block->GetSize());
+            else if(prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() > size) {
+                block->joinPrev(size - block->getSize());
             }
-            else if(prev->GetStatus() == Status::FREE && next->GetStatus() == Status::FREE && block->GetSize() + next->GetSize() + prev->GetSize() > size) {
-                if (prev->GetSize() > next->GetSize()) {
-                    block->joinNext(next->GetSize());
-                    block->joinPrev(size - block->GetSize());
+            else if(prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() > size) {
+                if (prev->getSize() > next->getSize()) {
+                    block->joinNext(next->getSize());
+                    block->joinPrev(size - block->getSize());
                 }
                 else {
-                    block->joinPrev(prev->GetSize());
-                    block->joinNext(size - block->GetSize());
+                    block->joinPrev(prev->getSize());
+                    block->joinNext(size - block->getSize());
                 }
             }
             else{
@@ -96,11 +96,11 @@ public:
         if (block == nullptr) {
             return;
         }
-        block->SetStatus(Status::FREE);
-        if (block->GetNext()->GetStatus() == Status::FREE) {
+        block->setStatus(Status::FREE);
+        if (block->getNext()->getStatus() == Status::FREE) {
             block->mergeNext();
         }
-        if (block->GetPrev()->GetStatus() == Status::FREE) {
+        if (block->getPrev()->getStatus() == Status::FREE) {
             block->mergePrev();
         }
     }

@@ -16,56 +16,56 @@ public:
       : size((size + 7) & ~7), status(status), next(nullptr), prev(nullptr) {}
 
   
-    void SetSize(int size) { this->size = size; }
-    void SetStatus(Status status) { this->status = status; }
-    void SetNext(MemoryBlock *next) { this->next = next; }
-    void SetPrev(MemoryBlock *prev) { this->prev = prev; }
+    void setSize(int size) { this->size = size; }
+    void setStatus(Status status) { this->status = status; }
+    void setNext(MemoryBlock *next) { this->next = next; }
+    void setPrev(MemoryBlock *prev) { this->prev = prev; }
 
-    int GetSize() { return size; }
-    Status GetStatus() { return status; }
-    MemoryBlock *GetNext() { return next; }
-    MemoryBlock *GetPrev() { return prev; }
+    int getSize() { return size; }
+    Status getStatus() { return status; }
+    MemoryBlock *getNext() { return next; }
+    MemoryBlock *getPrev() { return prev; }
 
     void RemoveCurrent() {
-        MemoryBlock *aux_next = GetNext();
-        MemoryBlock *aux_prev = GetPrev();
-        aux_prev->SetNext(aux_next);
-        aux_next->SetPrev(aux_prev);
+        MemoryBlock *aux_next = getNext();
+        MemoryBlock *aux_prev = getPrev();
+        aux_prev->setNext(aux_next);
+        aux_next->setPrev(aux_prev);
     }
 
     MemoryBlock *SplitBlock(int size) { 
-        MemoryBlock *aux = new MemoryBlock(this->GetSize() - size, Status::FREE);
-        this->SetSize(this->GetSize() - size);
-        this->SetStatus(Status::ALLOC);
-        MemoryBlock *next = this->GetNext();
-        this->SetNext(aux);
-        aux->SetPrev(this);
-        aux->SetNext(next);
+        MemoryBlock *aux = new MemoryBlock(this->getSize() - size, Status::FREE);
+        this->setSize(this->getSize() - size);
+        this->setStatus(Status::ALLOC);
+        MemoryBlock *next = this->getNext();
+        this->setNext(aux);
+        aux->setPrev(this);
+        aux->setNext(next);
         return this;
     }
     
     void joinNext(int size) {
-        this->SetSize(this->GetSize() + size);
-        this->GetNext()->SetSize(next->GetSize() - size);
-        if (this->GetNext()->GetSize() == 0) {
-            this->GetNext()->RemoveCurrent();
+        this->setSize(this->getSize() + size);
+        this->getNext()->setSize(next->getSize() - size);
+        if (this->getNext()->getSize() == 0) {
+            this->getNext()->RemoveCurrent();
         }
     }
     void joinPrev(int size) {
-        this->SetSize(this->GetSize() + size);
-        this->GetPrev()->SetSize(prev->GetSize() - size);
-        if (this->GetPrev()->GetSize() == 0) {
-            this->GetPrev()->RemoveCurrent();
+        this->setSize(this->getSize() + size);
+        this->getPrev()->setSize(prev->getSize() - size);
+        if (this->getPrev()->getSize() == 0) {
+            this->getPrev()->RemoveCurrent();
         }
     }
 
     void mergeNext() {
-        this->SetSize(this->GetSize() + this->GetNext()->GetSize());
-        this->GetNext()->RemoveCurrent();
+        this->setSize(this->getSize() + this->getNext()->getSize());
+        this->getNext()->RemoveCurrent();
     }
 
     void mergePrev() {
-        this->SetSize(this->GetSize() + this->GetPrev()->GetSize());
-        this->GetPrev()->RemoveCurrent();
+        this->setSize(this->getSize() + this->getPrev()->getSize());
+        this->getPrev()->RemoveCurrent();
     }
 };
