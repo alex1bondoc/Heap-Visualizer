@@ -30,7 +30,7 @@ public:
         if (best_fit == nullptr) {
             return nullptr;
         }
-        best_fit = best_fit->SplitBlock(size);
+        best_fit->SplitBlock(size);
         return best_fit;
     }
     MemoryBlock *myCalloc(int size) {
