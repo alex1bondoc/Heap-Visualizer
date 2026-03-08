@@ -42,5 +42,21 @@ public:
         aux->SetPrev(this);
         aux->SetNext(next);
         return this;
-  }
+    }
+    
+    void joinNext(int size) {
+        this->SetSize(this->GetSize() + size);
+        this->GetNext()->SetSize(next->GetSize() - size);
+        if (this->GetNext()->GetSize() == 0) {
+            this->GetNext()->RemoveCurrent();
+        }
+    }
+    void joinPrev(int size) {
+        this->SetSize(this->GetSize() + size);
+        this->GetPrev()->SetSize(prev->GetSize() - size);
+        if (this->GetPrev()->GetSize() == 0) {
+            this->GetPrev()->RemoveCurrent();
+        }
+    }
+
 };

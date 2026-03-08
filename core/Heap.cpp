@@ -63,7 +63,32 @@ public:
             return block->SplitBlock(size);
         }
         else{
-            return nullptr;
+            MemoryBlock *next = block->GetNext();
+            MemoryBlock *prev = block->GetPrev();
+            if (next->GetStatus() == Status::FREE && block->GetSize() + next->GetSize() > size) {
+                block->joinNext(size - block->GetSize());
+            }
+            else if(prev->GetStatus() == Status::FREE && block->GetSize() + prev->GetSize() > size) {
+                block->joinPrev(size - block->GetSize());
+            }
+            else if(prev->GetStatus() == Status::FREE && next->GetStatus() == Status::FREE && block->GetSize() + next->GetSize() + prev->GetSize() > size) {
+                if (prev->GetSize() > next->GetSize()) {
+                    block->joinNext(next->GetSize());
+                    block->joinPrev(size - block->GetSize());
+                }
+                else {
+                    block->joinPrev(prev->GetSize());
+                    block->joinNext(size - block->GetSize());
+                }
+            }
+            else{
+                MemoryBlock *new_block = myMalloc(size);
+                if (new_block == nullptr) {
+                    return nullptr;
+                }
+                myFree(block);
+                return new_block;
+            }
         }
         return nullptr;
     }
@@ -71,6 +96,6 @@ public:
         if (block == nullptr) {
             return;
         }
-
+        
     }
 };
