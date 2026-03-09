@@ -1,12 +1,11 @@
 #include "Heap.cpp"
 #include <iostream>
 #include <cstring>
-
+#include <vector>
 int main() {
     Heap heap(1024);
     char str[100] = ""; 
     MemoryBlock *block = nullptr;
-    int cnt = 0;
     while (true) {
         std::cin >> str;
         if (strcmp(str, "exit") == 0) {
@@ -32,11 +31,9 @@ int main() {
         while (aux != nullptr) {
             std::cout << aux->getSize() << " ";
             aux = aux->getNext();
-            cnt ++;
         }
         std::cout << std::endl;
     }
     
-    std::cout << cnt << std::endl;
     return 0;
 }

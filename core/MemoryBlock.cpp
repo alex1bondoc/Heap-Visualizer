@@ -12,10 +12,9 @@ private:
     MemoryBlock *prev;
 
 public: 
-    MemoryBlock(int size, Status status)
+    MemoryBlock(int size, Status status, MemoryBlock *next = nullptr, MemoryBlock *prev = nullptr)
       : size((size + 7) & ~7), status(status), next(nullptr), prev(nullptr) {}
 
-  
     void setSize(int size) { this->size = size; }
     void setStatus(Status status) { this->status = status; }
     void setNext(MemoryBlock *next) { this->next = next; }
@@ -34,6 +33,10 @@ public:
     }
 
     MemoryBlock *SplitBlock(int size) { 
+        if (this->getSize() - size == 0) {
+            this->setStatus(Status::ALLOC);
+            return this;
+        }
         MemoryBlock *aux = new MemoryBlock(this->getSize() - size, Status::FREE);
         this->setSize(size);
         this->setStatus(Status::ALLOC);
