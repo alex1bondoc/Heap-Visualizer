@@ -1,27 +1,17 @@
-#include "MemoryBlock.cpp"
+#include "Heap.h"
 
-class Heap {
-private:
 
-    Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
+Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
+Heap *Heap::instance = nullptr;
 
-    static Heap *instance; 
-    MemoryBlock *head;
-    int size;
+Heap *Heap::getInstance(int size) {
+    if (Heap::instance == nullptr) {
+        return new Heap(size);
+    }
+    return Heap::instance;
+}
 
-public:
-    Heap (const Heap&) = delete;
-    Heap operator= (const Heap&) = delete;
-
-    static Heap *getInstance(int size);
-
-    MemoryBlock *getHead() { return head; }
-    int getSize() { return size; }
-
-    void setHead(MemoryBlock *head) { this->head = head; }
-    void setSize(int size) { this->size = (size + 7) & ~7; }
-
-    MemoryBlock *myMalloc(int size) {
+MemoryBlock *Heap::myMalloc(int size) {
         size = (size + 7) & ~7;
 
         MemoryBlock *aux = this->getHead();
@@ -39,8 +29,9 @@ public:
         }
         best_fit->SplitBlock(size);
         return best_fit;
-    }
-    MemoryBlock *myCalloc(int size) {
+}
+
+MemoryBlock *Heap::myCalloc(int size) {
         size = (size + 7) & ~7;
 
         MemoryBlock *aux = head;
@@ -57,8 +48,9 @@ public:
         }
         best_fit = best_fit->SplitBlock(size);
         return best_fit;
-    }
-    MemoryBlock *myRealloc(MemoryBlock *block, int size) {
+}
+
+MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
         size = (size + 7) & ~7;
         if (block == nullptr) {
             return myMalloc(size);
@@ -100,18 +92,17 @@ public:
             }
         }
         return nullptr;
-    }
-    void myFree(MemoryBlock *block) {
-        if (block == nullptr) {
-            return;
-        }
-        block->setStatus(Status::FREE);
-        if (block->getNext()->getStatus() == Status::FREE) {
-            block->mergeNext();
-        }
-        if (block->getPrev()->getStatus() == Status::FREE) {
-            block->mergePrev();
-        }
-    }
-};
+}
 
+void Heap::myFree(MemoryBlock *block) {
+    if (block == nullptr) {
+        return;
+    }
+    block->setStatus(Status::FREE);
+    if (block->getNext()->getStatus() == Status::FREE) {
+        block->mergeNext();
+    }
+    if (block->getPrev()->getStatus() == Status::FREE) {
+        block->mergePrev();
+    }
+}

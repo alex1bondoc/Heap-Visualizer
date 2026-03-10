@@ -1,17 +1,9 @@
-#include "Heap.cpp"
+#include "Heap.h"
 #include <iostream>
 #include <cstring>
 #include <vector>
 
 
-Heap *Heap::instance = nullptr;
-
-Heap *Heap::getInstance(int size) {
-    if (Heap::instance == nullptr) {
-        return new Heap(size);
-    }
-    return Heap::instance;
-}
 int main() {
     Heap *heap = Heap::getInstance(1024);
     char str[100] = ""; 
