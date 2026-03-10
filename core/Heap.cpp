@@ -2,20 +2,18 @@
 
 class Heap {
 private:
-    static Heap *instance;
+
+    Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
+
+    static Heap *instance; 
     MemoryBlock *head;
     int size;
-    Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
+
 public:
     Heap (const Heap&) = delete;
-        Heap operator= (const Heap&) = delete;
+    Heap operator= (const Heap&) = delete;
 
-    static Heap *getInstance() {
-        if (!instance) {
-            instance = new Heap(1024);
-        }
-        return instance;
-    }
+    static Heap *getInstance(int size);
 
     MemoryBlock *getHead() { return head; }
     int getSize() { return size; }
@@ -98,6 +96,7 @@ public:
                 }
                 myFree(block);
                 return new_block;
+                return nullptr;
             }
         }
         return nullptr;
@@ -115,3 +114,4 @@ public:
         }
     }
 };
+
