@@ -1,26 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
+    <div className="min-h-screen bg-orange-600 flex items-center justify-center">
+      <div className="bg-white p-10 rounded-3xl shadow-2xl transform hover:rotate-6 transition-transform">
+        <h1 className="text-5xl font-black text-slate-900 italic">
+          TAILWIND MERGE! 🚀
+        </h1>
+        <p className="text-orange-600 font-mono mt-4 text-center">
+          Daca vezi portocaliu, ai invins sistemul.
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      </div>
     </div>
   );
 }
-
 export default App;
