@@ -100,13 +100,9 @@ void Heap::myFree(MemoryBlock *block) {
         return;
     }
     block->setStatus(Status::FREE);
-    if (block->getNext() !=  nullptr && block->getNext()->getStatus() == Status::FREE) {
-        block->mergeNext();
+    block->mergeNext();
+    if (block->getPrev()  == Heap::getHead()) { 
+        Heap::setHead(block); 
     }
-    if (block->getPrev() != nullptr && block->getPrev()->getStatus() == Status::FREE) {
-        if (block->getPrev()  == Heap::getHead()) { 
-            Heap::setHead(block); 
-        }
-        block->mergePrev();
-    }
+    block->mergePrev();
 }

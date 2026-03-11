@@ -53,6 +53,9 @@ void MemoryBlock::mergeNext() {
     this->getNext()->removeCurrent();
 }
 void MemoryBlock::mergePrev() {
+    if (this->getPrev() == nullptr || this->getPrev()->getStatus() != Status::FREE) {
+        return;
+    }
     this->setSize(this->getSize() + this->getPrev()->getSize());
     this->getPrev()->removeCurrent();
 }
