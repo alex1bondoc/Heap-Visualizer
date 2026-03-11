@@ -46,11 +46,15 @@ int main() {
                 if (index >= allocated_blocks.size()) {
                     aux = nullptr;
                 }
-                else aux = allocated_blocks[index];
-                allocated_blocks.erase(allocated_blocks.begin() + index);
+                else {
+                    aux = allocated_blocks[index];
+                    allocated_blocks.erase(allocated_blocks.begin() + index);
+                }
                 MemoryBlock *new_block = heap->myRealloc(aux, new_size);
+                std::cout << new_block->getSize() << " " << std::endl;
                 if (new_block != nullptr) {
-                    allocated_blocks.push_back(heap->myRealloc(aux, new_size));
+                    std::cout << "Test" << std::endl;
+                    allocated_blocks.push_back(new_block);
                 }
             } 
         }
