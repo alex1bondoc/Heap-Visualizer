@@ -42,7 +42,11 @@ int main() {
                 int index = 0;
                 int new_size = 0;
                 std::cin >> index >> new_size;
-                MemoryBlock *aux = allocated_blocks[index];
+                MemoryBlock *aux = nullptr;
+                if (index >= allocated_blocks.size()) {
+                    aux = nullptr;
+                }
+                else aux = allocated_blocks[index];
                 allocated_blocks.erase(allocated_blocks.begin() + index);
                 MemoryBlock *new_block = heap->myRealloc(aux, new_size);
                 if (new_block != nullptr) {

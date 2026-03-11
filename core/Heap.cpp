@@ -66,13 +66,15 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
         else{
             MemoryBlock *next = block->getNext();
             MemoryBlock *prev = block->getPrev();
-            if (next->getStatus() == Status::FREE && block->getSize() + next->getSize() > size) {
+            if (next != nullptr && next->getStatus() == Status::FREE && block->getSize() + next->getSize() > size) {
                 block->joinNext(size - block->getSize());
+                return block;
             }
-            else if(prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() > size) {
+            else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() > size) {
                 block->joinPrev(size - block->getSize());
+                return block;
             }
-            else if(prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() > size) {
+            else if(prev != nullptr && next != nullptr && prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() > size) {
                 if (prev->getSize() > next->getSize()) {
                     block->joinNext(next->getSize());
                     block->joinPrev(size - block->getSize());
@@ -81,15 +83,12 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
                     block->joinPrev(prev->getSize());
                     block->joinNext(size - block->getSize());
                 }
+                return block;
             }
             else{
                 MemoryBlock *new_block = myMalloc(size);
-                if (new_block == nullptr) {
-                    return nullptr;
-                }
                 myFree(block);
                 return new_block;
-                return nullptr;
             }
         }
         return nullptr;
