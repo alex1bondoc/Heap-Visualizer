@@ -19,6 +19,17 @@ Heap::~Heap() {
     }
 }
 
+std::ostream& operator<<(std::ostream& os, const Heap& heap) {
+    os << "Heap:";
+    MemoryBlock *aux = heap.head;
+    while (aux != nullptr) {
+        os << *aux;
+        aux = aux->getNext();
+    }
+    os << std::endl;
+    return os;
+}
+
 MemoryBlock *Heap::myMalloc(int size) {
         size = (size + 7) & ~7;
 

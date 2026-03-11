@@ -58,17 +58,6 @@ int main() {
                 }
             } 
         }
-        MemoryBlock *aux = heap->getHead();
-        while (aux != nullptr) {
-            std::string stat= "";
-            if (aux->getStatus() == Status::FREE) {
-                stat = "FREE";
-            }
-            else stat = "ALLOC";
-            std::cout << aux->getSize() << " " << stat << " ";
-            aux = aux->getNext();
-        }
-        std::cout << std::endl;
         for (auto it : allocated_blocks) {
             std::cout << it->getSize() << " ";
         }

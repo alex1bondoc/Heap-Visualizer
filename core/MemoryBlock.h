@@ -1,7 +1,19 @@
+#include <iostream>
+
 enum class Status : int {
     FREE = 0,
     ALLOC,
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Status& status) {
+    if (status == Status::FREE) {
+        os << "FREE";
+    }
+    else {
+        os << "ALLOC";
+    }
+    return os;
+}
 
 class MemoryBlock {
 private:
@@ -13,6 +25,8 @@ private:
 
 public: 
     MemoryBlock(int size, Status status, MemoryBlock *next = nullptr, MemoryBlock *prev = nullptr);
+    
+    friend std::ostream& operator<<(std::ostream& os, const MemoryBlock& memory_block);
 
     void setSize(int size) { this->size = size; }
     void setStatus(Status status) { this->status = status; }

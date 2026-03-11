@@ -3,6 +3,16 @@
 
 MemoryBlock::MemoryBlock(int size, Status status, MemoryBlock *next, MemoryBlock *prev) : size(size), status(status), next(next), prev(prev) {};
 
+std::ostream& operator<<(std::ostream& os, const MemoryBlock& memory_block) {
+    os << "[";
+    if (memory_block.status == Status::FREE) {
+        os << "FREE: ";
+    }
+    else os << "ALLOC: ";
+    os << memory_block.size << "] ";
+    return os;
+}
+
 void MemoryBlock::removeCurrent() {
     MemoryBlock *aux_next = this->getNext();
     MemoryBlock *aux_prev = this->getPrev();

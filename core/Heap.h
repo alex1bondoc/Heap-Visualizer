@@ -1,4 +1,5 @@
 #include "MemoryBlock.h"
+#include <iostream>
 
 class Heap {
 private:
@@ -14,6 +15,8 @@ public:
     Heap operator= (const Heap&) = delete;
     ~Heap();
     
+    friend std::ostream& operator<<(std::ostream& os, const Heap& heap);
+
     static Heap *getInstance(int size);
 
     MemoryBlock *getHead() { return head; }
