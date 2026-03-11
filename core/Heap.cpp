@@ -52,55 +52,55 @@ MemoryBlock *Heap::myCalloc(int size) {
 }
 
 MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
-        size = (size + 7) & ~7;
-        if (block == nullptr) {
-            return myMalloc(size);
+    size = (size + 7) & ~7;
+    if (block == nullptr) {
+        return myMalloc(size);
+    }
+    if (size == 0) {
+        myFree(block);
+        return nullptr;
+    }
+    if (size <= block->getSize()) {
+        return block->splitBlock(size);
+    }
+    else{
+        MemoryBlock *next = block->getNext();
+        MemoryBlock *prev = block->getPrev();
+        if (next != nullptr && next->getStatus() == Status::FREE && block->getSize() + next->getSize() >= size) {
+            block->joinNext(size - block->getSize());
+            return block;
         }
-        if (size == 0) {
-            myFree(block);
-            return nullptr;
+        else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
+            if (block->getSize() + prev->getSize() == size) {
+                Heap::setHead(block);
+            }
+            block->joinPrev(size - block->getSize());
+            return block;
         }
-        if (size <= block->getSize()) {
-            return block->splitBlock(size);
+        else if(prev != nullptr && next != nullptr && prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() >= size) {
+            if (prev->getSize() < next->getSize()) {
+                block->joinNext(next->getSize());
+                block->joinPrev(size - block->getSize());
+            }
+            else {
+                block->joinPrev(prev->getSize());
+                block->joinNext(size - block->getSize());
+            }
+            if (block->getPrev() == nullptr) {
+                Heap::setHead(block);
+            }
+            return block;
         }
         else{
-            MemoryBlock *next = block->getNext();
-            MemoryBlock *prev = block->getPrev();
-            if (next != nullptr && next->getStatus() == Status::FREE && block->getSize() + next->getSize() >= size) {
-                block->joinNext(size - block->getSize());
-                return block;
+            MemoryBlock *new_block = myMalloc(size);
+            if (new_block != nullptr) {
+                myFree(block);
             }
-            else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
-                if (block->getSize() + prev->getSize() == size) {
-                    Heap::setHead(block);
-                }
-                block->joinPrev(size - block->getSize());
-                return block;
-            }
-            else if(prev != nullptr && next != nullptr && prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() >= size) {
-                if (prev->getSize() < next->getSize()) {
-                    block->joinNext(next->getSize());
-                    block->joinPrev(size - block->getSize());
-                }
-                else {
-                    block->joinPrev(prev->getSize());
-                    block->joinNext(size - block->getSize());
-                }
-                if (block->getPrev() == nullptr) {
-                    Heap::setHead(block);
-                }
-                return block;
-            }
-            else{
-                MemoryBlock *new_block = myMalloc(size);
-                if (new_block != nullptr) {
-                    myFree(block);
-                }
-                else return block;
-                return new_block;
-            }
+            else return block;
+            return new_block;
         }
-        return nullptr;
+    }
+    return nullptr;
 }
 
 void Heap::myFree(MemoryBlock *block) {
@@ -109,8 +109,8 @@ void Heap::myFree(MemoryBlock *block) {
     }
     block->setStatus(Status::FREE);
     block->mergeNext();
-    if (block->getPrev()  == Heap::getHead()) { 
-        Heap::setHead(block); 
-    }
     block->mergePrev();
+    if (block->getPrev() == nullptr) {
+        Heap::setHead(block);
+    }
 }
