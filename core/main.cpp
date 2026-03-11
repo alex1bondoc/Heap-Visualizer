@@ -75,5 +75,6 @@ int main() {
         std::cout << std::endl;
     }
     
+    delete heap;
     return 0;
 }

@@ -11,6 +11,14 @@ Heap *Heap::getInstance(int size) {
     return Heap::instance;
 }
 
+Heap::~Heap() {
+    while (head != nullptr) {
+        MemoryBlock *aux = head->getNext();
+        delete head;
+        head = aux;
+    }
+}
+
 MemoryBlock *Heap::myMalloc(int size) {
         size = (size + 7) & ~7;
 

@@ -12,7 +12,8 @@ private:
 public:
     Heap (const Heap&) = delete;
     Heap operator= (const Heap&) = delete;
-
+    ~Heap();
+    
     static Heap *getInstance(int size);
 
     MemoryBlock *getHead() { return head; }
