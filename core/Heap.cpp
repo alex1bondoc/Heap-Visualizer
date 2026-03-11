@@ -1,5 +1,5 @@
 #include "Heap.h"
-
+#include <iostream>
 
 Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
 Heap *Heap::instance = nullptr;
@@ -27,26 +27,27 @@ MemoryBlock *Heap::myMalloc(int size) {
         if (best_fit == nullptr) {
             return nullptr;
         }
-        best_fit->SplitBlock(size);
+        best_fit->splitBlock(size);
         return best_fit;
 }
 
 MemoryBlock *Heap::myCalloc(int size) {
         size = (size + 7) & ~7;
 
-        MemoryBlock *aux = head;
+        MemoryBlock *aux = this->getHead();
         MemoryBlock *best_fit = nullptr;
         while (aux != nullptr) {
             if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-                if (aux->getSize() < best_fit->getSize()) {
+                if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
                     best_fit = aux;
                 }
             }
+            aux = aux->getNext();
         }
         if (best_fit == nullptr) {
             return nullptr;
         }
-        best_fit = best_fit->SplitBlock(size);
+        best_fit = best_fit->splitBlock(size);
         return best_fit;
 }
 
@@ -60,7 +61,7 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
             return nullptr;
         }
         if (size <= block->getSize()) {
-            return block->SplitBlock(size);
+            return block->splitBlock(size);
         }
         else{
             MemoryBlock *next = block->getNext();
@@ -95,14 +96,17 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
 }
 
 void Heap::myFree(MemoryBlock *block) {
-    if (block == nullptr) {
+    if (block == nullptr || block->getStatus() == Status::FREE) {
         return;
     }
     block->setStatus(Status::FREE);
-    if (block->getNext()->getStatus() == Status::FREE) {
+    if (block->getNext() !=  nullptr && block->getNext()->getStatus() == Status::FREE) {
         block->mergeNext();
     }
-    if (block->getPrev()->getStatus() == Status::FREE) {
+    if (block->getPrev() != nullptr && block->getPrev()->getStatus() == Status::FREE) {
+        if (block->getPrev()  == Heap::getHead()) { 
+            Heap::setHead(block); 
+        }
         block->mergePrev();
     }
 }

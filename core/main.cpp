@@ -7,7 +7,6 @@
 int main() {
     Heap *heap = Heap::getInstance(1024);
     char str[100] = ""; 
-    MemoryBlock *block = nullptr;
     std::vector<MemoryBlock *> allocated_blocks;
     while (true) {
         std::cin >> str;
@@ -23,16 +22,24 @@ int main() {
             else if (strcmp(str, "calloc") == 0) {
                 int size = 0;
                 std::cin >> size;
-                block = heap->myMalloc(size);
+                allocated_blocks.push_back(heap->myCalloc(size));
             }
             else if (strcmp(str, "free") == 0) {
-                
-                heap->myFree(block);
+                int index = 0;
+                std::cin >> index;
+                MemoryBlock *aux = allocated_blocks[index];
+                allocated_blocks.erase(allocated_blocks.begin() + index);
+                heap->myFree(aux);
             }
         }
         MemoryBlock *aux = heap->getHead();
         while (aux != nullptr) {
-            std::cout << aux->getSize() << " ";
+            std::string stat= "";
+            if (aux->getStatus() == Status::FREE) {
+                stat = "FREE";
+            }
+            else stat = "ALLOC";
+            std::cout << aux->getSize() << " " << stat << " ";
             aux = aux->getNext();
         }
         std::cout << std::endl;
