@@ -29,6 +29,7 @@ MemoryBlock *MemoryBlock::splitBlock(int size) {
         next->setPrev(aux);
     }
     aux->setNext(next);
+    aux->mergeNext();
     return this;
 }
 void MemoryBlock::joinNext(int size) { this->setSize(this->getSize() + size);
@@ -45,6 +46,9 @@ void MemoryBlock::joinPrev(int size) {
     }
 }
 void MemoryBlock::mergeNext() {
+    if (this->getNext() == nullptr || this->getNext()->getStatus() != Status::FREE) {
+        return;
+    }
     this->setSize(this->getSize() + this->getNext()->getSize());
     this->getNext()->removeCurrent();
 }

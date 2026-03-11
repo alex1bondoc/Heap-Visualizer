@@ -5,7 +5,8 @@
 
 
 int main() {
-    Heap *heap = Heap::getInstance(1024);
+    int heap_size = 1024;
+    Heap *heap = Heap::getInstance(heap_size);
     char str[100] = ""; 
     std::vector<MemoryBlock *> allocated_blocks;
     while (true) {
@@ -17,12 +18,18 @@ int main() {
             if (strcmp(str, "malloc") == 0) {
                 int size = 0;
                 std::cin >> size;
-                allocated_blocks.push_back(heap->myMalloc(size));
+                MemoryBlock *new_block = heap->myMalloc(size);
+                if (new_block != nullptr) {
+                    allocated_blocks.push_back(new_block);
+                }
             }
             else if (strcmp(str, "calloc") == 0) {
                 int size = 0;
                 std::cin >> size;
-                allocated_blocks.push_back(heap->myCalloc(size));
+                MemoryBlock *new_block = heap->myCalloc(size);
+                if (new_block != nullptr) {
+                    allocated_blocks.push_back(new_block);
+                }
             }
             else if (strcmp(str, "free") == 0) {
                 int index = 0;
@@ -31,6 +38,17 @@ int main() {
                 allocated_blocks.erase(allocated_blocks.begin() + index);
                 heap->myFree(aux);
             }
+            else if (strcmp(str, "realloc") == 0) {
+                int index = 0;
+                int new_size = 0;
+                std::cin >> index >> new_size;
+                MemoryBlock *aux = allocated_blocks[index];
+                allocated_blocks.erase(allocated_blocks.begin() + index);
+                MemoryBlock *new_block = heap->myRealloc(aux, new_size);
+                if (new_block != nullptr) {
+                    allocated_blocks.push_back(heap->myRealloc(aux, new_size));
+                }
+            } 
         }
         MemoryBlock *aux = heap->getHead();
         while (aux != nullptr) {
