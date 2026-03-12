@@ -1,11 +1,9 @@
-import React from 'react';
 import {useState, useEffect} from 'react';
 import {MemoryBlock} from './MemoryBlock';
-import type {Status} from './MemoryBlock';
 
 const blocks: MemoryBlock[] = [
     new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(2, 768, 'FREE'),
+    new MemoryBlock(2, 256, 'FREE'),
     new MemoryBlock(1, 256, 'ALLOC'), 
     new MemoryBlock(1, 256, 'FREE'), 
 ]
