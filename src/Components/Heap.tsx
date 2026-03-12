@@ -1,5 +1,5 @@
 import React from 'react';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {MemoryBlock} from './MemoryBlock';
 import type {Status} from './MemoryBlock';
 
@@ -7,12 +7,16 @@ const blocks: MemoryBlock[] = [
     new MemoryBlock(1, 256, 'ALLOC'), 
     new MemoryBlock(2, 768, 'FREE'),
     new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(1, 256, 'ALLOC'), 
+    new MemoryBlock(1, 256, 'FREE'), 
 ]
 
 export default function Heap() {
     const [head, setHead] = useState(blocks)
     const [size, setSize] = useState(1024)
+    useEffect(() => {
+        setHead(blocks)    
+    }, [blocks])
+
     return (
         <div className="flex flex-col gap-2 w-full max-w-5xl mx-auto p-4">
             <div className="text-slate-400 font-mono text-sm mb-1">
