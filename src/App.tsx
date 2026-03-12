@@ -9,6 +9,7 @@ function App() {
     <div className="flex flex-col h-screen w-full bg-slate-900  ">
         <Header size={heapSize}></Header>
         <Heap size={heapSize}></Heap>
+
     </div>
   )
 }
