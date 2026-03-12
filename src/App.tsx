@@ -4,12 +4,11 @@ import viteLogo from '/vite.svg'
 import Heap from './Components/Heap'
 import Header from './Components/Header'
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [heapSize, setHeapSize] = useState(1024)    
   return (
     <div className="flex flex-col h-screen w-full bg-slate-900  ">
-        <Header></Header>
-        <Heap></Heap>
+        <Header size={heapSize}></Header>
+        <Heap size={heapSize}></Heap>
     </div>
   )
 }
