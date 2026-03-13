@@ -1,0 +1,19 @@
+#ifdef __EMSCRIPTEN__
+    #include <emscripten.h>
+#endif
+#include "Heap.h"
+
+int heap_size = 1024;
+Heap *heap = Heap::getInstance(heap_size);
+
+
+extern "C" {
+    EMSCRIPTEN_KEEPALIVE
+    const char* getHeap() {
+        static std::string json;
+        json = serialize(*heap);
+        return json.c_str();
+    }
+}
+
+

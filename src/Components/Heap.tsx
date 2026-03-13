@@ -1,14 +1,8 @@
 import {useState, useEffect} from 'react';
 import {MemoryBlock} from './MemoryBlock';
 
-const blocks: MemoryBlock[] = [
-    new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(2, 256, 'FREE'),
-    new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(1, 256, 'FREE'), 
-]
 
-export default function Heap({size} : {size: number}) {
+export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock[]}) {
     const [head, setHead] = useState(blocks)
     useEffect(() => {
         setHead(blocks)    
