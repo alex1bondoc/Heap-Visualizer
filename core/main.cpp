@@ -22,7 +22,7 @@ int main() {
                 if (new_block != nullptr) {
                     allocated_blocks.push_back(new_block);
                 }
-                std::cout << serialize(*new_block) << std::endl;
+                std::cout << serialize(*heap) << std::endl;
             }
             else if (strcmp(str, "calloc") == 0) {
                 int size = 0;
@@ -59,6 +59,7 @@ int main() {
                 }
             } 
         }
+        std::cout << *heap <<std::endl;
         for (auto it : allocated_blocks) {
             std::cout << it->getSize() << " ";
         }

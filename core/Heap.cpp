@@ -1,4 +1,6 @@
 #include "Heap.h"
+#include <sstream>
+#include <string>
 #include <iostream>
 
 Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
@@ -20,7 +22,7 @@ Heap::~Heap() {
 }
 
 std::ostream& operator<<(std::ostream& os, const Heap& heap) {
-    os << "Heap:";
+    os << "Heap: ";
     MemoryBlock *aux = heap.head;
     while (aux != nullptr) {
         os << *aux;
@@ -132,4 +134,19 @@ void Heap::myFree(MemoryBlock *block) {
     if (block->getPrev() == nullptr) {
         Heap::setHead(block);
     }
+}
+
+std::string serialize(const Heap& heap) {
+    std::ostringstream ss;
+    MemoryBlock *aux = heap.head;
+    ss << "[ ";
+    while (aux != nullptr) {
+        ss << serialize(*aux);
+        aux = aux->getNext();
+        if (aux != nullptr) {
+            ss << ", ";
+        }
+    }
+    ss << " ]";
+    return ss.str();
 }

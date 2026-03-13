@@ -1,5 +1,6 @@
 #include "MemoryBlock.h"
 #include <iostream>
+#include <string>
 
 class Heap {
 private:
@@ -29,5 +30,7 @@ public:
     MemoryBlock *myCalloc(int size);
     MemoryBlock *myRealloc(MemoryBlock *block, int size); 
     void myFree(MemoryBlock *block);
+
+    friend std::string serialize(const Heap& heap);
 };
 
