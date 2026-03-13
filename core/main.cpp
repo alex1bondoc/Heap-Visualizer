@@ -22,6 +22,7 @@ int main() {
                 if (new_block != nullptr) {
                     allocated_blocks.push_back(new_block);
                 }
+                std::cout << serialize(*new_block) << std::endl;
             }
             else if (strcmp(str, "calloc") == 0) {
                 int size = 0;

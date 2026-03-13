@@ -27,7 +27,7 @@ public:
     MemoryBlock(int size, Status status, MemoryBlock *next = nullptr, MemoryBlock *prev = nullptr);
     
     friend std::ostream& operator<<(std::ostream& os, const MemoryBlock& memory_block);
-
+    
     void setSize(int size) { this->size = size; }
     void setStatus(Status status) { this->status = status; }
     void setNext(MemoryBlock *next) { this->next = next; }
@@ -39,10 +39,14 @@ public:
     MemoryBlock *getPrev() { return prev; }
 
     void removeCurrent(); 
+
     MemoryBlock *splitBlock(int size);    
+
     void joinNext(int size);
     void joinPrev(int size); 
-    void mergeNext(); 
 
+    void mergeNext(); 
     void mergePrev(); 
+
+    friend std::string serialize(const MemoryBlock& memory_block);
 };
