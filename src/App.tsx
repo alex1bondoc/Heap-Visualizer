@@ -1,7 +1,9 @@
-import { useState } from 'react'
-import Heap from './Components/Heap'
-import Header from './Components/Header'
-import { MemoryBlock } from './Components/MemoryBlock'
+import { useEffect, useState } from 'react';
+import Heap from './Components/Heap';
+import Header from './Components/Header';
+import { MemoryBlock } from './Components/MemoryBlock';
+import heapModule from './heap.js';
+
 const blocks: MemoryBlock[] = [
     new MemoryBlock(1, 256, 'ALLOC'), 
     new MemoryBlock(2, 256, 'FREE'),
