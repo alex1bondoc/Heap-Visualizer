@@ -20,10 +20,4 @@ extern "C" {
     const void doMalloc(int size) {
         heap->myMalloc(size);
     }
-//    EMSCRIPTEN_KEEPALIVE
-//    const void realloc(char *addres, int size) {      
-//    }
-//    EMSCRIPTEN_KEEPALIVE
-//    const void free(char *addres) {  
-//    }
 }

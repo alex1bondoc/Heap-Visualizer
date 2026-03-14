@@ -45,7 +45,7 @@ function App() {
     <div className="flex flex-col h-screen w-full bg-slate-900  ">
         <Header size={heapSize}></Header>
         <Heap size={heapSize} blocks={blocks}></Heap>
-        <button onClick={() => malloc(wasmInstance)}>malloc</button>
+        <button onClick={() => malloc(wasmInstance)} className="border-2 bg-amber-400 h-12 w-20">malloc</button>
     </div>
   )
 }
