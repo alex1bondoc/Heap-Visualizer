@@ -17,15 +17,13 @@ extern "C" {
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
-    const void malloc(int size) {
-
+    const void doMalloc(int size) {
+        heap->myMalloc(size);
     }
-    EMSCRIPTEN_KEEPALIVE
-    const void realloc(char *addres, int size) {
-    
-    }
-    EMSCRIPTEN_KEEPALIVE
-    const void free(char *addres) {
-    
-    }
+//    EMSCRIPTEN_KEEPALIVE
+//    const void realloc(char *addres, int size) {      
+//    }
+//    EMSCRIPTEN_KEEPALIVE
+//    const void free(char *addres) {  
+//    }
 }

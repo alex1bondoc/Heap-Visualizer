@@ -34,10 +34,18 @@ function App() {
     const json = JSON.parse(jsonString);
     setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
   }
+  const malloc = (instance: any) => {      
+    if (instance === null) {
+        return;
+    }
+    instance._doMalloc(128);
+    refreshBlocks(instance);
+  }
   return (
     <div className="flex flex-col h-screen w-full bg-slate-900  ">
         <Header size={heapSize}></Header>
         <Heap size={heapSize} blocks={blocks}></Heap>
+        <button onClick={() => malloc(wasmInstance)}>malloc</button>
     </div>
   )
 }
