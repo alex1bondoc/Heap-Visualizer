@@ -1,17 +1,26 @@
-import { useEffect, useState } from 'react';
 import Heap from './Components/Heap';
 import Header from './Components/Header';
 import { MemoryBlock } from './Components/MemoryBlock';
-import heapModule from './heap.js';
+import {useState, useEffect} from 'react';
+// @ts-ignore
+import createHeapModule from './heap.js';
 
-const blocks: MemoryBlock[] = [
-    new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(2, 256, 'FREE'),
-    new MemoryBlock(1, 256, 'ALLOC'), 
-    new MemoryBlock(1, 256, 'FREE'), 
-]
 function App() {
-  const [heapSize, setHeapSize] = useState(1024)    
+  const heapSize = 1024
+  const [blocks, setBlocks] = useState([])
+  useEffect(() => {
+    createHeapModule({
+        locateFile: () => "/heap.wasm"
+    }).then((instance: any) => {
+        const adresaMemorie = instance._getHeap(); 
+        const jsonReal = instance.UTF8ToString(adresaMemorie);
+        const json = JSON.parse(jsonReal);
+        const newBlocks = json.map((block: any) => {
+            return new MemoryBlock(block.id, block.size, block.status);
+        })
+        setBlocks(newBlocks);
+    });
+  }, []);
   return (
     <div className="flex flex-col h-screen w-full bg-slate-900  ">
         <Header size={heapSize}></Header>
