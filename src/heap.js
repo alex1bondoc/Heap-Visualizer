@@ -1705,6 +1705,7 @@ function checkIncomingModuleAPI() {
 // Imports from the Wasm binary.
 var _getHeap = Module['_getHeap'] = makeInvalidEarlyAccess('_getHeap');
 var _doMalloc = Module['_doMalloc'] = makeInvalidEarlyAccess('_doMalloc');
+var _doFree = Module['_doFree'] = makeInvalidEarlyAccess('_doFree');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -1721,6 +1722,7 @@ var wasmMemory = makeInvalidEarlyAccess('wasmMemory');
 function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['getHeap'] != 'undefined', 'missing Wasm export: getHeap');
   assert(typeof wasmExports['doMalloc'] != 'undefined', 'missing Wasm export: doMalloc');
+  assert(typeof wasmExports['doFree'] != 'undefined', 'missing Wasm export: doFree');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
   assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
@@ -1734,6 +1736,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['__indirect_function_table'] != 'undefined', 'missing Wasm export: __indirect_function_table');
   _getHeap = Module['_getHeap'] = createExportWrapper('getHeap', 0);
   _doMalloc = Module['_doMalloc'] = createExportWrapper('doMalloc', 1);
+  _doFree = Module['_doFree'] = createExportWrapper('doFree', 1);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];

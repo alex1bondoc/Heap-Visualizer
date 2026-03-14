@@ -7,47 +7,54 @@ import {useState, useEffect} from 'react';
 import createHeapModule from './heap.js';
 
 function App() {
-  const heapSize = 1024
-  const [blocks, setBlocks] = useState<MemoryBlock[]>([])
-  const [wasmInstance, setWasmInstance] = useState<any>(null)
+    const heapSize = 1024
+    const [blocks, setBlocks] = useState<MemoryBlock[]>([])
+    const [wasmInstance, setWasmInstance] = useState<any>(null)
   
-  useEffect(() => {
-    createHeapModule({
-        locateFile: () => "/heap.wasm"
-    }).then((instance: any) => {
-        setWasmInstance(instance);
-    });
-  }, []);
-  useEffect(() => {
-    if (wasmInstance === null) {
-        return;
+    useEffect(() => {
+        createHeapModule({
+            locateFile: () => "/heap.wasm"
+        }).then((instance: any) => {
+            setWasmInstance(instance);
+        });
+    }, []);
+    useEffect(() => {
+            if (wasmInstance === null) {
+            return;
+        }
+        refreshBlocks(wasmInstance);
+    }, [wasmInstance]);
+    const refreshBlocks = (instance: any) => {
+        if (wasmInstance === null) {
+            return;
+        }
+        console.log("test")
+        const serializedHeap = instance._getHeap();
+        const jsonString = instance.UTF8ToString(serializedHeap);
+        const json = JSON.parse(jsonString);
+        setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
     }
-    refreshBlocks(wasmInstance);
-  }, [wasmInstance]);
-  const refreshBlocks = (instance: any) => {
-    if (wasmInstance === null) {
-        return;
+    const malloc = (instance: any) => {      
+        if (instance === null) {
+            return;
+        }
+        instance._doMalloc(128);
+        refreshBlocks(instance);
     }
-    console.log("test")
-    const serializedHeap = instance._getHeap();
-    const jsonString = instance.UTF8ToString(serializedHeap);
-    const json = JSON.parse(jsonString);
-    setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
-  }
-  const malloc = (instance: any) => {      
-    if (instance === null) {
-        return;
+    const free = (instance: any, hexAddres: string) => {
+        if (instance === null) {
+            return;
+        }
+        instance._doFree(hexAddres);
+        refreshBlocks(instance);
     }
-    instance._doMalloc(128);
-    refreshBlocks(instance);
-  }
-  return (
-    <div className="flex flex-col h-screen w-full bg-slate-900  ">
-        <Header size={heapSize}></Header>
-        <Heap size={heapSize} blocks={blocks}></Heap>
-        <button onClick={() => malloc(wasmInstance)} className="border-2 bg-amber-400 h-12 w-20">malloc</button>
-    </div>
-  )
+    return (
+        <div className="flex flex-col h-screen w-full bg-slate-900  ">
+            <Header size={heapSize}></Header>
+            <Heap size={heapSize} blocks={blocks}></Heap>
+            <button onClick={() => malloc(wasmInstance)} className="border-2 bg-amber-400 h-12 w-20">malloc</button>
+        </div>
+    )
 }
 
 export default App
