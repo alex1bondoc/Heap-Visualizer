@@ -1,6 +1,7 @@
 import Heap from './Components/Heap';
 import Header from './Components/Header';
 import { MemoryBlock } from './Components/MemoryBlock';
+import type { Status } from './Components/MemoryBlock';
 import {useState, useEffect} from 'react';
 // @ts-ignore
 import createHeapModule from './heap.js';
@@ -12,11 +13,11 @@ function App() {
     createHeapModule({
         locateFile: () => "/heap.wasm"
     }).then((instance: any) => {
-        const adresaMemorie = instance._getHeap(); 
-        const jsonReal = instance.UTF8ToString(adresaMemorie);
-        const json = JSON.parse(jsonReal);
+        const serializedString = instance._getHeap(); 
+        const jsonString = instance.UTF8ToString(serializedString);
+        const json = JSON.parse(jsonString);
         const newBlocks = json.map((block: any) => {
-            return new MemoryBlock(block.id, block.size, block.status);
+            return new MemoryBlock(block.id, block.size, block.status as Status);
         })
         setBlocks(newBlocks);
     });

@@ -1,9 +1,10 @@
+export type Status = 'FREE' | 'ALLOC';
 export class MemoryBlock {
     public id: string;
-    public status: 'FREE' | 'ALLOC';
+    public status: Status;
     public size: number;
 
-    public constructor(id: string, size: number, status: any) {
+    public constructor(id: string, size: number, status: Status) {
         this.id = id;
         this.size = size;
         this.status = status;
