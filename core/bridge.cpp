@@ -16,4 +16,16 @@ extern "C" {
         json = serialize(*heap);
         return json.c_str();
     }
+    EMSCRIPTEN_KEEPALIVE
+    const void malloc(int size) {
+
+    }
+    EMSCRIPTEN_KEEPALIVE
+    const void realloc(char *addres, int size) {
+    
+    }
+    EMSCRIPTEN_KEEPALIVE
+    const void free(char *addres) {
+    
+    }
 }
