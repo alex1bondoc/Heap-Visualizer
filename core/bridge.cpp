@@ -29,4 +29,9 @@ extern "C" {
         void *ptr = reinterpret_cast<void *>(adressNumerical);
         heap->myFree((MemoryBlock *)ptr);
     }
+    EMSCRIPTEN_KEEPALIVE
+    const void *hydrate_heap(char *json) {
+        delete heap;
+        *heap->getInstance(heap_size, json);
+    }
 }

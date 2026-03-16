@@ -26,6 +26,7 @@ function App() {
             setWasmInstance(instance);
         });
     }, []);
+
     useEffect(() => {
         if (wasmInstance === null) {
             return;
@@ -33,10 +34,12 @@ function App() {
         const saved = localStorage.getItem('heap');
         if (saved === null)
             refreshBlocks(wasmInstance);
+        useEffect(() => {
     }, [wasmInstance]);
-    useEffect(() => {
+
         localStorage.setItem('heap', JSON.stringify(blocks));
     }, [blocks])
+
     const refreshBlocks = (instance: any) => {
         if (wasmInstance === null) {
             return;

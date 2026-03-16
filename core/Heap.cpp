@@ -1,14 +1,66 @@
 #include "Heap.h"
 #include <sstream>
-#include <string>
+#include <cstring>
 #include <iostream>
 
 Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
+Heap::Heap(int size, char *json) : size(size), head(nullptr){
+    char *p = strtok(json, "[]");
+    char *p2 = strtok(p, ",");
+    MemoryBlock *aux = nullptr;
+    Status current_status;
+    while (p2 != nullptr) {
+        if (strstr(p2, "status") != nullptr){
+            if (strstr(p2, "FREE") != nullptr) {
+                current_status = Status::FREE;
+            }
+            else {
+                current_status = Status::ALLOC;
+            }
+        }
+        else if (strstr(p2, "size") != nullptr){
+            int x = 0, power = 1;
+            bool foundNumber = false;
+            std::cout << p2 << std::endl;
+            for (int i = strlen(p2) - 1; i >= 0; --i) {
+                std::cout << p2[i] << std::endl;
+                if (p2[i] == ' ' && foundNumber) {
+                        break;
+                }
+                else if (p2[i] <= '9' && p2[i] >= '0') {
+                    foundNumber = true;
+                    x += power * (p2[i] - '0');
+                    power *= 10;
+                }
+            }
+            if (aux == nullptr) {
+                this->head = new MemoryBlock(x, current_status);
+                aux = head;
+            }
+            else {
+                MemoryBlock *newMemoryBlock = new MemoryBlock(x, current_status, nullptr, aux);
+                aux->setNext(newMemoryBlock);
+                aux = aux->getNext();
+            }
+            std::cout << *aux << std::endl;
+        }
+        p2 = strtok(nullptr, ",");
+    }
+    
+};
+
 Heap *Heap::instance = nullptr;
 
 Heap *Heap::getInstance(int size) {
     if (Heap::instance == nullptr) {
         return new Heap(size);
+    }
+    return Heap::instance;
+}
+
+Heap *Heap::getInstance(int size, char *json) {
+    if (Heap::instance == nullptr) {
+        return new Heap(size, json);
     }
     return Heap::instance;
 }
