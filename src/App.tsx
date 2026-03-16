@@ -8,20 +8,12 @@ import createHeapModule from './heap.js';
 
 function App() {
     const heapSize = 1024
-    const [blocks, setBlocks] = useState<MemoryBlock[]> (() => {
-        const saved = localStorage.getItem('heap');
-        if (saved) {
-            return JSON.parse(saved).map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)})
-        }
-        else {
-            return []
-        }
-    })
+    const [blocks, setBlocks] = useState<MemoryBlock[]>([])
     const [wasmInstance, setWasmInstance] = useState<any>(null)
   
     useEffect(() => {
         createHeapModule({
-            locateFile: () => "/heap.wasm"
+            locateFile: () => "heap.wasm"
         }).then((instance: any) => {
             setWasmInstance(instance);
         });
@@ -31,20 +23,14 @@ function App() {
         if (wasmInstance === null) {
             return;
         }
-        const saved = localStorage.getItem('heap');
-        if (saved === null)
-            refreshBlocks(wasmInstance);
-        useEffect(() => {
+        refreshBlocks(wasmInstance);
     }, [wasmInstance]);
-
-        localStorage.setItem('heap', JSON.stringify(blocks));
-    }, [blocks])
 
     const refreshBlocks = (instance: any) => {
         if (wasmInstance === null) {
             return;
         }
-        const serializedHeap = instance._getHeap();
+        const serializedHeap = instance._wasmGetHeap();
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
@@ -53,14 +39,14 @@ function App() {
         if (instance === null) {
             return;
         }
-        instance._doMalloc(128);
+        instance._wasmMalloc(128);
         refreshBlocks(instance);
     }
     const free = (instance: any, hexAddres: string) => {
         if (instance === null) {
             return;
         }
-        instance._doFree(hexAddres);
+        instance._wasmFree(hexAddres);
         refreshBlocks(instance);
     }
     return (

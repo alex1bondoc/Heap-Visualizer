@@ -11,17 +11,17 @@ Heap *heap = Heap::getInstance(heap_size);
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
-    const char* getHeap() {
+    const char* wasmGetHeap() {
         static std::string json;
         json = serialize(*heap);
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
-    const void doMalloc(const int size) {
+    const void wasmMalloc(const int size) {
         heap->myMalloc(size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void doFree(const char *address) {
+    const void wasmFree(const char *address) {
         if (address != nullptr) {
             return;
         }
@@ -30,8 +30,8 @@ extern "C" {
         heap->myFree((MemoryBlock *)ptr);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void *hydrate_heap(char *json) {
+    const void wasmReconstructHeap(char *json) {
         delete heap;
-        *heap->getInstance(heap_size, json);
+        Heap::getInstance(heap_size, json);
     }
 }
