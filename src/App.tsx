@@ -8,7 +8,15 @@ import createHeapModule from './heap.js';
 
 function App() {
     const heapSize = 1024
-    const [blocks, setBlocks] = useState<MemoryBlock[]>([])
+    const [blocks, setBlocks] = useState<MemoryBlock[]> (() => {
+        const saved = localStorage.getItem('heap');
+        if (saved) {
+            return JSON.parse(saved).map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)})
+        }
+        else {
+            return []
+        }
+    })
     const [wasmInstance, setWasmInstance] = useState<any>(null)
   
     useEffect(() => {
@@ -19,11 +27,16 @@ function App() {
         });
     }, []);
     useEffect(() => {
-            if (wasmInstance === null) {
+        if (wasmInstance === null) {
             return;
         }
-        refreshBlocks(wasmInstance);
+        const saved = localStorage.getItem('heap');
+        if (saved === null)
+            refreshBlocks(wasmInstance);
     }, [wasmInstance]);
+    useEffect(() => {
+        localStorage.setItem('heap', JSON.stringify(blocks));
+    }, [blocks])
     const refreshBlocks = (instance: any) => {
         if (wasmInstance === null) {
             return;
