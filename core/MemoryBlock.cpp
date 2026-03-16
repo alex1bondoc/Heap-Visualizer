@@ -79,6 +79,6 @@ void MemoryBlock::mergePrev() {
 
 std::string serialize(const MemoryBlock& memory_block) {
     std::ostringstream ss; 
-    ss << "{ " << "\"id\": \"" << &memory_block << "\", \"status\": \"" << memory_block.status << "\", \"size\": " << memory_block.size << " }";
+    ss << "{" << "\"id\":\"" << &memory_block << "\",\"status\":\"" << memory_block.status << "\",\"size\":" << memory_block.size << "}";
     return ss.str();
 }

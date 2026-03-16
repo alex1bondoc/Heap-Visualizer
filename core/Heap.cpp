@@ -191,14 +191,14 @@ void Heap::myFree(MemoryBlock *block) {
 std::string serialize(const Heap& heap) {
     std::ostringstream ss;
     MemoryBlock *aux = heap.head;
-    ss << "[ ";
+    ss << "[";
     while (aux != nullptr) {
         ss << serialize(*aux);
         aux = aux->getNext();
         if (aux != nullptr) {
-            ss << ", ";
+            ss << ",";
         }
     }
-    ss << " ]";
+    ss << "]";
     return ss.str();
 }
