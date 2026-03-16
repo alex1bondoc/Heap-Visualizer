@@ -39,13 +39,11 @@ function App() {
         else {
             console.log(JSON.stringify(blocks));
             wasmInstance._wasmReconstructHeap(JSON.stringify(blocks));
-            wasmInstance._wasmMalloc(128);
         }
     }, [wasmInstance]);
 
-    useEffect(() => {
-        localStorage.setItem('heap', JSON.stringify(blocks));
-    }, [blocks])
+    
+
     const refreshBlocks = (instance: any) => {
         if (wasmInstance === null) {
             return;
@@ -54,6 +52,7 @@ function App() {
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
+        localStorage.setItem('heap', JSON.stringify(blocks));
     }
     const malloc = (instance: any) => {      
         if (instance === null) {
