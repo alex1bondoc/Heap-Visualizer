@@ -36,7 +36,6 @@ function App() {
         const serializedHeap = instance.ccall('wasmGetHeap', ['string'], [], []);
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
-        console.log(json);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
     }
     const malloc = (instance: any) => {      
@@ -68,6 +67,7 @@ function App() {
         const value = event.target.value;
         setAddress(value);
     }
+    
     return (
         <div className="flex flex-col h-screen w-full bg-slate-900  ">
             <Header size={heapSize}></Header>
