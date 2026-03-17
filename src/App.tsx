@@ -36,7 +36,6 @@ function App() {
         const serializedHeap = instance.ccall('wasmGetHeap', ['string'], [], []);
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
-        console.log(json)
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
     }
     const malloc = (instance: any) => {      

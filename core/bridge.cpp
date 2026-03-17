@@ -22,21 +22,16 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmFree(const char *address) {
-        std::cout << address <<std::endl;
         if (address == nullptr) {
-            std::cout << "what" << std::endl;
             return;
         }
         unsigned long adressNumerical = std::stoul(address, nullptr, 16);
         void *ptr = reinterpret_cast<void *>(adressNumerical);
-        std::cout << (MemoryBlock *)ptr << std::endl;
         heap->myFree((MemoryBlock *)ptr);
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;
-        std::cout << json << std::endl;
         heap->getInstance(heap_size, json);
-        std::cout << serialize(*heap) << std::endl;
     }
 }
