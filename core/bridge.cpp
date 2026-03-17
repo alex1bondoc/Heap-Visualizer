@@ -22,11 +22,14 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmFree(const char *address) {
-        if (address != nullptr) {
+        std::cout << address <<std::endl;
+        if (address == nullptr) {
+            std::cout << "what" << std::endl;
             return;
         }
         unsigned long adressNumerical = std::stoul(address, nullptr, 16);
         void *ptr = reinterpret_cast<void *>(adressNumerical);
+        std::cout << (MemoryBlock *)ptr << std::endl;
         heap->myFree((MemoryBlock *)ptr);
     }
     EMSCRIPTEN_KEEPALIVE
