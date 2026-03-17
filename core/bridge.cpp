@@ -32,6 +32,7 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE 
     const void wasmRealloc(const char *address, const int size) {
         if (address == nullptr) {
+            
             return;
         }
         unsigned long adressNumerical = std::stoul(address, nullptr, 16);
