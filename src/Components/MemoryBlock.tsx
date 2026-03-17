@@ -22,6 +22,7 @@ export class MemoryBlock {
                     this.status === 'FREE' ? 'bg-emerald-500/30' : 'bg-red-500/30'
                 }`}
             >
+                <button></button>
             </div>
         )
     }

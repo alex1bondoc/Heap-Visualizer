@@ -32,6 +32,8 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;
-        Heap::getInstance(heap_size, json);
+        std::cout << json << std::endl;
+        heap->getInstance(heap_size, json);
+        std::cout << serialize(*heap) << std::endl;
     }
 }

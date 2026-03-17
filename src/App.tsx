@@ -8,15 +8,7 @@ import createHeapModule from './heap.js';
 
 function App() {
     const heapSize = 1024
-    const [blocks, setBlocks] = useState<MemoryBlock[]>(() => {
-        const saved = localStorage.getItem('heap');
-        if (saved === null) {
-            return []
-        }
-        else {
-            return JSON.parse(saved).map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)})
-        }
-    })
+    const [blocks, setBlocks] = useState<MemoryBlock[]>([])
     const [wasmInstance, setWasmInstance] = useState<any>(null)
   
     useEffect(() => {
@@ -27,19 +19,11 @@ function App() {
             refreshBlocks(instance);
         });
     }, []);
-
     useEffect(() => {
         if (wasmInstance === null) {
             return;
         }
-        const saved = localStorage.getItem('heap');
-        if (saved !== null) {
-            refreshBlocks(wasmInstance);
-        }
-        else {
-            console.log(JSON.stringify(blocks));
-            wasmInstance._wasmReconstructHeap(JSON.stringify(blocks));
-        }
+        refreshBlocks(wasmInstance);
     }, [wasmInstance]);
 
     
@@ -52,7 +36,6 @@ function App() {
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
-        localStorage.setItem('heap', JSON.stringify(blocks));
     }
     const malloc = (instance: any) => {      
         if (instance === null) {
