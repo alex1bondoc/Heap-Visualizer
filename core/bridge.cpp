@@ -29,6 +29,15 @@ extern "C" {
         void *ptr = reinterpret_cast<void *>(adressNumerical);
         heap->myFree((MemoryBlock *)ptr);
     }
+    EMSCRIPTEN_KEEPALIVE 
+    const void wasmRealloc(const char *address, const int size) {
+        if (address == nullptr) {
+            return;
+        }
+        unsigned long adressNumerical = std::stoul(address, nullptr, 16);
+        void *ptr = reinterpret_cast<void *>(adressNumerical);
+        heap->myRealloc((MemoryBlock *)ptr, size);
+    }
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;

@@ -36,6 +36,7 @@ function App() {
         const serializedHeap = instance.ccall('wasmGetHeap', ['string'], [], []);
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
+        console.log(json);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status)}));
     }
     const malloc = (instance: any) => {      
@@ -45,14 +46,20 @@ function App() {
         instance.ccall('wasmMalloc', null, ['number'], [mallocSize]);
         refreshBlocks(instance);
     }
-    const free = (instance: any, hexAddres: string) => {
+    const free = (instance: any, hexAddress: string) => {
         if (instance === null) {
             return;
         }
-        instance.ccall('wasmFree', null, ['string'], [hexAddres]);
+        instance.ccall('wasmFree', null, ['string'], [hexAddress]);
         refreshBlocks(instance);
     }
-
+    const realloc = (instance: any, hexAddress: string, newSize: number) => {
+        if (instance === null) {
+            return;
+        }
+        instance.ccall('wasmRealloc', null, ['string', 'number'], [hexAddress, newSize]);
+        refreshBlocks(instance);
+    }
     const handleChange = (event: any) => {
         const value = event.target.value;
         setMallocSize(value);
@@ -66,9 +73,9 @@ function App() {
             <Header size={heapSize}></Header>
             <Heap size={heapSize} blocks={blocks}></Heap>
             <button onClick={() => malloc(wasmInstance)} className="border-2 bg-amber-400 h-12 w-20 rounded-xl">malloc</button>
-            <input className="h-12 w-25 bg-white rounded-xl" value={mallocSize} onChange={handleChange} ></input>
-
             <button onClick={() => free(wasmInstance, address)} className="border-2 bg-amber-400 h-12 w-20 rounded-xl">Free</button>
+            <button onClick={() => realloc(wasmInstance, address, mallocSize)} className="border-2 bg-amber-400 h-12 w-20 rounded-xl">Realloc</button>
+            <input className="h-12 w-25 bg-white rounded-xl" value={mallocSize} onChange={handleChange} ></input>
             <input className="h-12 w-25 bg-white rounded-xl" value={address} onChange={handleAddressChange} ></input>
         </div>
     )

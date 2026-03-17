@@ -4347,6 +4347,7 @@ function checkIncomingModuleAPI() {
 var _wasmGetHeap = Module['_wasmGetHeap'] = makeInvalidEarlyAccess('_wasmGetHeap');
 var _wasmMalloc = Module['_wasmMalloc'] = makeInvalidEarlyAccess('_wasmMalloc');
 var _wasmFree = Module['_wasmFree'] = makeInvalidEarlyAccess('_wasmFree');
+var _wasmRealloc = Module['_wasmRealloc'] = makeInvalidEarlyAccess('_wasmRealloc');
 var _wasmReconstructHeap = Module['_wasmReconstructHeap'] = makeInvalidEarlyAccess('_wasmReconstructHeap');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
@@ -4365,6 +4366,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['wasmGetHeap'] != 'undefined', 'missing Wasm export: wasmGetHeap');
   assert(typeof wasmExports['wasmMalloc'] != 'undefined', 'missing Wasm export: wasmMalloc');
   assert(typeof wasmExports['wasmFree'] != 'undefined', 'missing Wasm export: wasmFree');
+  assert(typeof wasmExports['wasmRealloc'] != 'undefined', 'missing Wasm export: wasmRealloc');
   assert(typeof wasmExports['wasmReconstructHeap'] != 'undefined', 'missing Wasm export: wasmReconstructHeap');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
@@ -4380,6 +4382,7 @@ function assignWasmExports(wasmExports) {
   _wasmGetHeap = Module['_wasmGetHeap'] = createExportWrapper('wasmGetHeap', 0);
   _wasmMalloc = Module['_wasmMalloc'] = createExportWrapper('wasmMalloc', 1);
   _wasmFree = Module['_wasmFree'] = createExportWrapper('wasmFree', 1);
+  _wasmRealloc = Module['_wasmRealloc'] = createExportWrapper('wasmRealloc', 2);
   _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', 1);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
