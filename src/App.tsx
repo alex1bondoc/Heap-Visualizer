@@ -2,7 +2,7 @@ import Heap from "./Components/Heap";
 import Header from "./Components/Header";
 import { MemoryBlock } from "./Components/MemoryBlock";
 import type { Status } from "./Components/MemoryBlock";
-import { useState, useEffect } from "react";
+import { useState, useEffect} from "react";
 // @ts-ignore
 import createHeapModule from "./heap.js";
 
@@ -16,29 +16,35 @@ function App() {
         createHeapModule({
         locateFile: () => "heap.wasm",
         }).then((instance: any) => {
-        setWasmInstance(instance);
-        refreshBlocks(instance);
+            setWasmInstance(instance);
         });
     }, []);
     useEffect(() => {
         if (wasmInstance === null) {
-        return;
+            return;
         }
+        getOldBlocks(wasmInstance);
         refreshBlocks(wasmInstance);
     }, [wasmInstance]);
-
+    const getOldBlocks = (instance: any) => {
+        if (instance === null) {
+            return;
+        }
+        const saved = localStorage.getItem("blocks");
+        console.log(saved);
+        if (saved !== null) {
+            instance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
+        }
+    }
     const refreshBlocks = (instance: any) => {
         if (wasmInstance === null) {
-        return;
+            return;
         }
         const serializedHeap = instance.ccall("wasmGetHeap", ["string"], [], []);
         const jsonString = instance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
-        setBlocks(
-        json.map((block: any) => {
-            return new MemoryBlock(block.id, block.size, block.status as Status);
-        }),
-        );
+        setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status);}));
+        localStorage.setItem("blocks", JSON.stringify(json));
     };
     const malloc = (instance: any) => {
         if (instance === null) {
