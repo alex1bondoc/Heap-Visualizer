@@ -85,43 +85,47 @@ std::ostream& operator<<(std::ostream& os, const Heap& heap) {
 }
 
 MemoryBlock *Heap::myMalloc(int size) {
-        size = (size + 7) & ~7;
-
-        MemoryBlock *aux = this->getHead();
-        MemoryBlock *best_fit = nullptr;
-        while (aux != nullptr) {
-            if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-                if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
-                    best_fit = aux;
-                }
+    size = (size + 7) & ~7;
+    if (size == 0) {
+        return nullptr;     
+    }
+    MemoryBlock *aux = this->getHead();
+    MemoryBlock *best_fit = nullptr;
+    while (aux != nullptr) {
+        if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
+            if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
+                best_fit = aux;
             }
-            aux = aux->getNext();
         }
-        if (best_fit == nullptr) {
-            return nullptr;
-        }
-        best_fit->splitBlock(size);
-        return best_fit;
+        aux = aux->getNext();
+    }
+    if (best_fit == nullptr) {
+        return nullptr;
+    }
+    best_fit->splitBlock(size);
+    return best_fit;
 }
 
 MemoryBlock *Heap::myCalloc(int size) {
-        size = (size + 7) & ~7;
-
-        MemoryBlock *aux = this->getHead();
-        MemoryBlock *best_fit = nullptr;
-        while (aux != nullptr) {
-            if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-                if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
-                    best_fit = aux;
-                }
+    size = (size + 7) & ~7;
+    if (size == 0) {
+        return nullptr;
+    }
+    MemoryBlock *aux = this->getHead();
+    MemoryBlock *best_fit = nullptr;
+    while (aux != nullptr) {
+        if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
+            if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
+                best_fit = aux;
             }
-            aux = aux->getNext();
         }
-        if (best_fit == nullptr) {
-            return nullptr;
-        }
-        best_fit = best_fit->splitBlock(size);
-        return best_fit;
+        aux = aux->getNext();
+    }
+    if (best_fit == nullptr) {
+        return nullptr;
+    }
+    best_fit = best_fit->splitBlock(size);
+    return best_fit;
 }
 
 MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
