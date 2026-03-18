@@ -23,55 +23,50 @@ function App() {
         if (wasmInstance === null) {
             return;
         }
-        getOldBlocks(wasmInstance);
-        refreshBlocks(wasmInstance);
+        getOldBlocks();
+        refreshBlocks();
     }, [wasmInstance]);
-    const getOldBlocks = (instance: any) => {
-        if (instance === null) {
+    const getOldBlocks = () => {
+        if (wasmInstance === null) {
             return;
         }
         const saved = localStorage.getItem("blocks");
         console.log(saved);
         if (saved !== null) {
-            instance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
+            wasmInstance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
         }
     }
-    const refreshBlocks = (instance: any) => {
+    const refreshBlocks = () => {
         if (wasmInstance === null) {
             return;
         }
-        const serializedHeap = instance.ccall("wasmGetHeap", ["string"], [], []);
-        const jsonString = instance.UTF8ToString(serializedHeap);
+        const serializedHeap = wasmInstance.ccall("wasmGetHeap", ["string"], [], []);
+        const jsonString = wasmInstance.UTF8ToString(serializedHeap);
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status);}));
         localStorage.setItem("blocks", JSON.stringify(json));
         console.log(json);
     };
-    const malloc = (instance: any) => {
-        if (instance === null) {
+    const malloc = () => {
+        if (wasmInstance === null) {
         return;
         }
-        instance.ccall("wasmMalloc", null, ["number"], [mallocSize]);
-        refreshBlocks(instance);
+        wasmInstance.ccall("wasmMalloc", null, ["number"], [mallocSize]);
+        refreshBlocks();
     };
-    const free = (instance: any, hexAddress: string) => {
-        if (instance === null) {
+    const free = () => {
+        if (wasmInstance === null) {
         return;
         }
-        instance.ccall("wasmFree", null, ["string"], [hexAddress]);
-        refreshBlocks(instance);
+        wasmInstance.ccall("wasmFree", null, ["string"], [address]);
+        refreshBlocks();
     };
-    const realloc = (instance: any, hexAddress: string, newSize: number) => {
-        if (instance === null) {
-        return;
+    const realloc = () => {
+        if (wasmInstance === null) {
+            return;
         }
-        instance.ccall(
-        "wasmRealloc",
-        null,
-        ["string", "number"],
-        [hexAddress, newSize],
-        );
-        refreshBlocks(instance);
+        wasmInstance.ccall("wasmRealloc", null, ["string", "number"], [address, mallocSize]);
+        refreshBlocks();
     };
     const handleChange = (event: any) => {
         const value = event.target.value;
@@ -87,19 +82,19 @@ function App() {
         <Header size={heapSize}></Header>
         <Heap size={heapSize} blocks={blocks}></Heap>
         <button
-            onClick={() => malloc(wasmInstance)}
+            onClick={() => malloc()}
             className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
         >
             malloc
         </button>
         <button
-            onClick={() => free(wasmInstance, address)}
+            onClick={() => free()}
             className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
         >
             Free
         </button>
         <button
-            onClick={() => realloc(wasmInstance, address, mallocSize)}
+            onClick={() => realloc()}
             className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
         >
             Realloc
