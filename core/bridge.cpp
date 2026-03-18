@@ -44,4 +44,9 @@ extern "C" {
         delete heap;
         heap = Heap::getInstance(heap_size, json);
     }
+    EMSCRIPTEN_KEEPALIVE
+    const void resetHeap() {
+        delete heap;
+        heap = Heap::getInstance(heap_size);
+    }   
 }
