@@ -2,7 +2,8 @@ compile-test:
 	g++ core/main.cpp core/Heap.cpp core/MemoryBlock.cpp -o core/main 
 run-test:
 	core/main
-
+clean-test:
+	rm -f core/main
 activate-wasm: 
 	/bin/fish ~/.emsdk/emsdk_env.fish
 compile-wasm: activate-wasm
