@@ -45,6 +45,7 @@ function App() {
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status);}));
         localStorage.setItem("blocks", JSON.stringify(json));
+        console.log(json);
     };
     const malloc = (instance: any) => {
         if (instance === null) {

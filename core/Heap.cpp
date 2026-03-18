@@ -21,9 +21,7 @@ Heap::Heap(int size, char *json) : size(size), head(nullptr){
         else if (strstr(p2, "size") != nullptr){
             int x = 0, power = 1;
             bool foundNumber = false;
-            std::cout << p2 << std::endl;
             for (int i = strlen(p2) - 1; i >= 0; --i) {
-                std::cout << p2[i] << std::endl;
                 if (p2[i] == ' ' && foundNumber) {
                         break;
                 }
@@ -42,7 +40,6 @@ Heap::Heap(int size, char *json) : size(size), head(nullptr){
                 aux->setNext(newMemoryBlock);
                 aux = aux->getNext();
             }
-            std::cout << *aux << std::endl;
         }
         p2 = strtok(nullptr, ",");
     }
