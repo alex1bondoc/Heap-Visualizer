@@ -2,9 +2,11 @@ import Heap from "./Components/Heap";
 import Header from "./Components/Header";
 import { MemoryBlock } from "./Components/MemoryBlock";
 import type { Status } from "./Components/MemoryBlock";
-import { useState, useEffect} from "react";
+import { useContext, useState, useEffect} from "react";
 // @ts-ignore
 import createHeapModule from "./heap.js";
+import {WasmInstanceContext, MallocFunctionContext, FreeFunctionContext, ReallocFunctionContext} from "./Components/Contexts.js";
+import {ControlPanel} from "./Components/ControlPanel";
 
 function App() {
     const heapSize = 1024;
@@ -47,11 +49,11 @@ function App() {
         localStorage.setItem("blocks", JSON.stringify(json));
         console.log(json);
     };
-    const malloc = () => {
+    const malloc = (size: number) => {
         if (wasmInstance === null) {
         return;
         }
-        wasmInstance.ccall("wasmMalloc", null, ["number"], [mallocSize]);
+        wasmInstance.ccall("wasmMalloc", null, ["number"], [size]);
         refreshBlocks();
     };
     const free = () => {
@@ -78,37 +80,42 @@ function App() {
     };
 
     return (
-        <div className="flex flex-col h-screen w-full bg-slate-900  ">
-        <Header size={heapSize}></Header>
-        <Heap size={heapSize} blocks={blocks}></Heap>
-        <button
-            onClick={() => malloc()}
-            className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-        >
-            malloc
-        </button>
-        <button
-            onClick={() => free()}
-            className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-        >
-            Free
-        </button>
-        <button
-            onClick={() => realloc()}
-            className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-        >
-            Realloc
-        </button>
-        <input
-            className="h-12 w-25 bg-white rounded-xl"
-            value={mallocSize}
-            onChange={handleChange}
-        ></input>
-        <input
-            className="h-12 w-25 bg-white rounded-xl"
-            value={address}
-            onChange={handleAddressChange}
-        ></input>
+        <div className="flex flex-col h-screen w-full bg-slate-900 center ">
+            <Header size={heapSize}></Header>
+            <Heap size={heapSize} blocks={blocks}></Heap>
+            <button
+                onClick={() => malloc(mallocSize)}
+                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
+            >
+                malloc
+            </button>
+            <button
+                onClick={() => free()}
+                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
+            >
+                Free
+            </button>
+            <button
+                onClick={() => realloc()}
+                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
+            >
+                Realloc
+            </button>
+            <input
+                className="h-12 w-25 bg-white rounded-xl"
+                value={mallocSize}
+                onChange={handleChange}
+            ></input>
+            <input
+                className="h-12 w-25 bg-white rounded-xl"
+                value={address}
+                onChange={handleAddressChange}
+            ></input>
+            <WasmInstanceContext value={wasmInstance}> 
+                <MallocFunctionContext value={malloc}>
+                    <ControlPanel></ControlPanel>
+                </MallocFunctionContext>
+            </WasmInstanceContext>
         </div>
     );
 }
