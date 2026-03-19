@@ -1,9 +1,10 @@
 export type Status = 'FREE' | 'ALLOC';
+import {useState} from 'react';
+import {SelectedBlockPanel} from './SelectedBlockPanel';
 export class MemoryBlock {
     public id: string;
     public status: Status;
     public size: number;
-
     public constructor(id: string, size: number, status: Status) {
         this.id = id;
         this.size = size;
@@ -22,9 +23,8 @@ export class MemoryBlock {
                     this.status === 'FREE' ? 'bg-emerald-500/30' : 'bg-red-500/30'
                 }`}
             >
-                <button></button>
             </div>
-        )
+        );
     }
     public toString() {
         var string = ''
@@ -33,3 +33,4 @@ export class MemoryBlock {
         return string
     }
 }
+

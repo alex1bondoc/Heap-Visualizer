@@ -56,18 +56,18 @@ function App() {
         wasmInstance.ccall("wasmMalloc", null, ["number"], [size]);
         refreshBlocks();
     };
-    const free = () => {
+    const free = (address: string) => {
         if (wasmInstance === null) {
         return;
         }
         wasmInstance.ccall("wasmFree", null, ["string"], [address]);
         refreshBlocks();
     };
-    const realloc = () => {
+    const realloc = (address: string, size: number) => {
         if (wasmInstance === null) {
             return;
         }
-        wasmInstance.ccall("wasmRealloc", null, ["string", "number"], [address, mallocSize]);
+        wasmInstance.ccall("wasmRealloc", null, ["string", "number"], [address, size]);
         refreshBlocks();
     };
     const handleChange = (event: any) => {
@@ -90,13 +90,13 @@ function App() {
                 malloc
             </button>
             <button
-                onClick={() => free()}
+                onClick={() => free(address)}
                 className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
             >
                 Free
             </button>
             <button
-                onClick={() => realloc()}
+                onClick={() => realloc(address, mallocSize)}
                 className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
             >
                 Realloc
