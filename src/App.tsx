@@ -5,7 +5,7 @@ import type { Status } from "./Components/MemoryBlock";
 import { useContext, useState, useEffect} from "react";
 // @ts-ignore
 import createHeapModule from "./heap.js";
-import {WasmInstanceContext, MallocFunctionContext, FreeFunctionContext, ReallocFunctionContext} from "./Components/Contexts.js";
+import {MallocFunctionContext, FreeFunctionContext, ReallocFunctionContext} from "./Components/Contexts.js";
 import {ControlPanel} from "./Components/ControlPanel";
 
 function App() {
@@ -111,11 +111,9 @@ function App() {
                 value={address}
                 onChange={handleAddressChange}
             ></input>
-            <WasmInstanceContext value={wasmInstance}> 
-                <MallocFunctionContext value={malloc}>
-                    <ControlPanel></ControlPanel>
-                </MallocFunctionContext>
-            </WasmInstanceContext>
+            <MallocFunctionContext value={malloc}>
+                <ControlPanel></ControlPanel>
+            </MallocFunctionContext>
         </div>
     );
 }

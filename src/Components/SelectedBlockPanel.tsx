@@ -10,7 +10,7 @@ export function SelectedBlockPanel({block}:{block: MemoryBlock}) {
         setSize(value);
     }
     return (
-        <div className="w-100 h-25 flex flex-col bg-white">
+        <div className="w-100 h-25 flex flex-col bg-slate-700 border-4 rounded-xl">
             <p>Status: {block.status}</p>
             <p>Size: {block.size}</p>
             <button onClick={() => free(block.id)} className="bg-amber-400">Free Block</button>
