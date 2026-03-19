@@ -22,7 +22,9 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
                     );
                 })}
             </div>
-            {selectedBlock !== null && <SelectedBlockPanel block={selectedBlock}/>}
+            <div>
+                {selectedBlock !== null && <SelectedBlockPanel block={selectedBlock} onHover={onHover} onExit={onExit}/>}
+            </div>
         </div>
         
     )   
