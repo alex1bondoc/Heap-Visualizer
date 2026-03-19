@@ -13,7 +13,7 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
             <div className="flex w-full h-24 bg-slate-900 rounded-xl border-4 border-slate-100 overflow-hidden shadow-2xl">
                 {head.map((block) => {
                     return (
-                       <MemoryBlockUI block={block} total={size}/>
+                       <MemoryBlockUI key={block.id} block={block} total={size}/>
                     );
                 })}
             </div>

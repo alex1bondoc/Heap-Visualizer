@@ -1,8 +1,7 @@
 import {useContext, useState} from 'react';
-import {WasmInstanceContext, MallocFunctionContext} from "./Contexts";
+import {MallocFunctionContext} from "./Contexts";
 
 export function ControlPanel() {
-    const wasmInstace = useContext(WasmInstanceContext);
     const [size, setSize] = useState(0)
     const malloc = useContext(MallocFunctionContext);
     const handleChange = (event: any) => {
