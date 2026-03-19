@@ -10,12 +10,12 @@ export function SelectedBlockPanel({block}:{block: MemoryBlock}) {
         setSize(value);
     }
     return (
-        <div className="w-100 h-25 flex flex-col">
+        <div className="w-100 h-25 flex flex-col bg-white">
             <p>Status: {block.status}</p>
             <p>Size: {block.size}</p>
-            <button onClick={() => free(block.id)}>Free Block</button>
+            <button onClick={() => free(block.id)} className="bg-amber-400">Free Block</button>
             <input onChange={handleChange} value={size}></input>
-            <button onClick={() =>  realloc(block.id, size)}></button>
+            <button onClick={() =>  realloc(block.id, size)} className="bg-amber-400"></button>
         </div>
     )
 }
