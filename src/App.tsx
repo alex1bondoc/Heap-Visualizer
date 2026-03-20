@@ -82,7 +82,11 @@ function App() {
     return (
         <div className="flex flex-col h-screen w-full bg-slate-900 center ">
             <Header size={heapSize}></Header>
+            <ReallocFunctionContext value={realloc}>
+            <FreeFunctionContext value={free}>
             <Heap size={heapSize} blocks={blocks}></Heap>
+            </FreeFunctionContext>
+            </ReallocFunctionContext>
             <button
                 onClick={() => malloc(mallocSize)}
                 className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
