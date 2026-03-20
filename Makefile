@@ -2,6 +2,8 @@ compile-test:
 	g++ core/main.cpp core/Heap.cpp core/MemoryBlock.cpp -o core/main 
 run-test:
 	core/main
+memory-test:
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind.log core/main
 clean-test:
 	rm -f core/main
 activate-wasm: 

@@ -186,7 +186,7 @@ void Heap::myFree(MemoryBlock *block) {
     }
     block->setStatus(Status::FREE);
     block->mergeNext();
-    block->getPrev()->mergeNext();
+    block->mergePrev();
     if (block->getPrev() == nullptr) {
         Heap::setHead(block);
     }
