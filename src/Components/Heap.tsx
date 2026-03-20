@@ -8,7 +8,7 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
     const [position, setPosition] = useState<{x: number, y:number}>({x: 0, y: 0});
     const onHover = (e: React.MouseEvent<HTMLDivElement>, block : MemoryBlock) => {
         const rec = e.currentTarget.getBoundingClientRect();
-        setPosition({x: rec.left, y: rec.bottom});
+        setPosition({x: rec.left + rec.width / 2, y: rec.bottom});
         console.log(block.id + "enter");
         setSelectedBlock(block);
 
@@ -27,7 +27,7 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
                 })}
             </div>
             {selectedBlock !== null && 
-                <div style={{position: 'fixed', left: `${position.x}px`, top: `${position.y}px`}} className="z-50">
+                <div style={{position: 'fixed', left: `${position.x}px`, top: `${position.y + 4}px`}} className="z-50 -translate-x-1/2">
                     <SelectedBlockPanel block={selectedBlock} onHover={onHover} onExit={onExit}/>
                 </div>
             }
