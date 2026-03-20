@@ -10,10 +10,9 @@ import {ControlPanel} from "./Components/ControlPanel";
 
 function App() {
     const heapSize = 1024;
-    const [mallocSize, setMallocSize] = useState<number>(0);
     const [blocks, setBlocks] = useState<MemoryBlock[]>([]);
     const [wasmInstance, setWasmInstance] = useState<any>(null);
-    const [address, setAddress] = useState<string>("");
+
     useEffect(() => {
         createHeapModule({
         locateFile: () => "heap.wasm",
@@ -70,15 +69,6 @@ function App() {
         wasmInstance.ccall("wasmRealloc", null, ["string", "number"], [address, size]);
         refreshBlocks();
     };
-    const handleChange = (event: any) => {
-        const value = event.target.value;
-        setMallocSize(value);
-    };
-    const handleAddressChange = (event: any) => {
-        const value = event.target.value;
-        setAddress(value);
-    };
-
     return (
         <div className="flex flex-col h-screen w-full bg-slate-900 center ">
             <Header size={heapSize}></Header>
@@ -87,34 +77,6 @@ function App() {
             <Heap size={heapSize} blocks={blocks}></Heap>
             </FreeFunctionContext>
             </ReallocFunctionContext>
-            <button
-                onClick={() => malloc(mallocSize)}
-                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-            >
-                malloc
-            </button>
-            <button
-                onClick={() => free(address)}
-                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-            >
-                Free
-            </button>
-            <button
-                onClick={() => realloc(address, mallocSize)}
-                className="border-2 bg-amber-400 h-12 w-20 rounded-xl"
-            >
-                Realloc
-            </button>
-            <input
-                className="h-12 w-25 bg-white rounded-xl"
-                value={mallocSize}
-                onChange={handleChange}
-            ></input>
-            <input
-                className="h-12 w-25 bg-white rounded-xl"
-                value={address}
-                onChange={handleAddressChange}
-            ></input>
             <MallocFunctionContext value={malloc}>
                 <ControlPanel></ControlPanel>
             </MallocFunctionContext>

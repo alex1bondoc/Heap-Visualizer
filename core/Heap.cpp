@@ -130,6 +130,9 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
     if (block == nullptr) {
         return myMalloc(size);
     }
+    if (block->getStatus() == Status::FREE) {
+        return nullptr;
+    }
     if (size == 0) {
         myFree(block);
         return nullptr;
@@ -183,7 +186,7 @@ void Heap::myFree(MemoryBlock *block) {
     }
     block->setStatus(Status::FREE);
     block->mergeNext();
-    block->mergePrev();
+    block->getPrev()->mergeNext();
     if (block->getPrev() == nullptr) {
         Heap::setHead(block);
     }
