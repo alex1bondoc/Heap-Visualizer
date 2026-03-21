@@ -1,12 +1,10 @@
-#include "Heap.h"
 #include <iostream>
 #include <cstring>
 #include <sstream>
-#include <vector>
-
+#include "BestFitHeap.h"
 
 int main() {
-    Heap *heap = Heap::getInstance(1024);
+    Heap *heap = (Heap *)(BestFitHeap::getInstance(1024));
     heap->myMalloc(128);
     std::cout << serialize(*heap) << std::endl;
     std::ostringstream jsonStream;

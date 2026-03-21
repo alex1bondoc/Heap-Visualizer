@@ -8,8 +8,6 @@ private:
     BestFitHeap(int size); 
     BestFitHeap(int size, char *json);
     static BestFitHeap *instance; 
-    MemoryBlock *head;
-    int size;
 
 public:
     BestFitHeap (const BestFitHeap&) = delete;
@@ -27,10 +25,10 @@ public:
     void setHead(MemoryBlock *head) { this->head = head; }
     void setSize(int size) { this->size = (size + 7) & ~7; }
 
-    MemoryBlock *myMalloc(int size);
-    MemoryBlock *myCalloc(int size);
-    MemoryBlock *myRealloc(MemoryBlock *block, int size); 
-    void myFree(MemoryBlock *block);
+    MemoryBlock *myMalloc(int size) override;
+    MemoryBlock *myCalloc(int size) override;
+    MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
+    void myFree(MemoryBlock *block) override;
 
     friend std::string serialize(const BestFitHeap& heap);
 };

@@ -68,6 +68,18 @@ Heap::~Heap() {
     }
 }
 
+MemoryBlock *Heap::myMalloc(int size) {
+    return nullptr;
+}
+MemoryBlock *Heap::myCalloc(int size) {
+    return nullptr;
+}
+MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
+    return nullptr;
+}
+void Heap::myFree(MemoryBlock *block) {
+}
+
 std::ostream& operator<<(std::ostream& os, const Heap& heap) {
     os << "BestFitHeap: ";
     MemoryBlock *aux = heap.head;
