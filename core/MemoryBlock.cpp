@@ -1,5 +1,7 @@
 #include "MemoryBlock.h"
 #include <iostream>
+#include <sstream>
+#include <string>
 
 MemoryBlock::MemoryBlock(int size, Status status, MemoryBlock *next, MemoryBlock *prev) : size(size), status(status), next(next), prev(prev) {};
 
@@ -24,6 +26,7 @@ void MemoryBlock::removeCurrent() {
     }
     delete this;
 }
+
 MemoryBlock *MemoryBlock::splitBlock(int size) {
     if (this->getSize() - size == 0) {
         this->setStatus(Status::ALLOC);
@@ -42,12 +45,14 @@ MemoryBlock *MemoryBlock::splitBlock(int size) {
     aux->mergeNext();
     return this;
 }
+
 void MemoryBlock::joinNext(int size) { this->setSize(this->getSize() + size);
     this->getNext()->setSize(next->getSize() - size);
     if (this->getNext()->getSize() == 0) {
         this->getNext()->removeCurrent();
     }
 }
+
 void MemoryBlock::joinPrev(int size) {
     this->setSize(this->getSize() + size);
     this->getPrev()->setSize(prev->getSize() - size);
@@ -55,6 +60,7 @@ void MemoryBlock::joinPrev(int size) {
         this->getPrev()->removeCurrent();
     }
 }
+
 void MemoryBlock::mergeNext() {
     if (this->getNext() == nullptr || this->getNext()->getStatus() != Status::FREE) {
         return;
@@ -62,10 +68,17 @@ void MemoryBlock::mergeNext() {
     this->setSize(this->getSize() + this->getNext()->getSize());
     this->getNext()->removeCurrent();
 }
+
 void MemoryBlock::mergePrev() {
     if (this->getPrev() == nullptr || this->getPrev()->getStatus() != Status::FREE) {
         return;
     }
     this->setSize(this->getSize() + this->getPrev()->getSize());
     this->getPrev()->removeCurrent();
+}
+
+std::string serialize(const MemoryBlock& memory_block) {
+    std::ostringstream ss; 
+    ss << "{" << "\"id\":\"" << &memory_block << "\",\"status\":\"" << memory_block.status << "\",\"size\":" << memory_block.size << "}";
+    return ss.str();
 }
