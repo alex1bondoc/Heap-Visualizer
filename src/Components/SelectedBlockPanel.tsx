@@ -4,10 +4,14 @@ import {FreeFunctionContext, ReallocFunctionContext} from "./Contexts";
 export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
     const free = useContext(FreeFunctionContext);
     const realloc = useContext(ReallocFunctionContext);
-    const [size, setSize] = useState<number>(0);
+    const [size, setSize] = useState<number | null>(null);
     const handleChange = (event: any) => {
-        const value = event.target.value;
-        setSize(value);
+        const value = event.target.value.replace(/\D/g, '');
+        if (Number(value) > 1024) {
+            setSize(1024);
+        }
+        else 
+            setSize(value);
     }
     return (
         <div className="relative w-80 flex flex-col bg-slate-800 border-4 boder-slate-900 rounded-3xl shadow-xl p-6 gap-5 font-sans">
@@ -25,7 +29,8 @@ export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock,
                     onChange={handleChange} 
                     value={size}
                     placeholder="Bytes..."></input> 
-                    <button onClick={() =>  realloc(block.id, size)} className="w-1/4 bg-blue-400 rounded-xl">Realloc</button>
+                    <button onClick={() =>  {realloc(block.id, size)
+                    setSize(0)}} className="w-1/4 bg-blue-400 rounded-xl">Realloc</button>
                 </div>
             : <></>}
         </div>
