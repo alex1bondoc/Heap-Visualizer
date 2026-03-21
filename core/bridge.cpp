@@ -4,10 +4,10 @@
 #else
     #define EMSCRIPTEN_KEEPALIVE
 #endif
-#include "Heap.h"
+#include "BestFitHeap.h"
 
 int heap_size = 1024;
-Heap *heap = Heap::getInstance(heap_size);
+BestFitHeap *heap = BestFitHeap::getInstance(heap_size);
 
 extern "C" {
     EMSCRIPTEN_KEEPALIVE
@@ -42,11 +42,11 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;
-        heap = Heap::getInstance(heap_size, json);
+        heap = BestFitHeap::getInstance(heap_size, json);
     }
     EMSCRIPTEN_KEEPALIVE
     const void resetHeap() {
         delete heap;
-        heap = Heap::getInstance(heap_size);
+        heap = BestFitHeap::getInstance(heap_size);
     }   
 }

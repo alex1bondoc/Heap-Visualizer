@@ -2,24 +2,24 @@
 #include <iostream>
 #include <string>
 
-class Heap {
+class BestFitHeap{
 private:
 
-    Heap(int size); 
-    Heap(int size, char *json);
-    static Heap *instance; 
+    BestFitHeap(int size); 
+    BestFitHeap(int size, char *json);
+    static BestFitHeap *instance; 
     MemoryBlock *head;
     int size;
 
 public:
-    Heap (const Heap&) = delete;
-    Heap operator= (const Heap&) = delete;
-    ~Heap();
+    BestFitHeap (const BestFitHeap&) = delete;
+    BestFitHeap operator= (const BestFitHeap&) = delete;
+    ~BestFitHeap();
     
-    friend std::ostream& operator<<(std::ostream& os, const Heap& heap);
+    friend std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap);
 
-    static Heap *getInstance(int size);
-    static Heap *getInstance(int size, char *json);
+    static BestFitHeap *getInstance(int size);
+    static BestFitHeap *getInstance(int size, char *json);
 
     MemoryBlock *getHead() { return head; }
     int getSize() { return size; }
@@ -32,6 +32,6 @@ public:
     MemoryBlock *myRealloc(MemoryBlock *block, int size); 
     void myFree(MemoryBlock *block);
 
-    friend std::string serialize(const Heap& heap);
+    friend std::string serialize(const BestFitHeap& heap);
 };
 

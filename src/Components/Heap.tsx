@@ -9,12 +9,10 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
     const onHover = (e: React.MouseEvent<HTMLDivElement>, block : MemoryBlock) => {
         const rec = e.currentTarget.getBoundingClientRect();
         setPosition({x: rec.left + rec.width / 2, y: rec.bottom});
-        console.log(block.id + "enter");
         setSelectedBlock(block);
 
     }
     const onExit = () => {
-        console.log("exit")
         setSelectedBlock(null);
     }
     return (

@@ -1,10 +1,10 @@
-#include "Heap.h"
+#include "BestFitHeap.h"
 #include <sstream>
 #include <cstring>
 #include <iostream>
 
-Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
-Heap::Heap(int size, char *json) : size(size), head(nullptr){
+BestFitHeap::BestFitHeap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
+BestFitHeap::BestFitHeap(int size, char *json) : size(size), head(nullptr){
     char *p = strtok(json, "[]");
     char *p2 = strtok(p, ",");
     MemoryBlock *aux = nullptr;
@@ -46,23 +46,23 @@ Heap::Heap(int size, char *json) : size(size), head(nullptr){
     
 };
 
-Heap *Heap::instance = nullptr;
+BestFitHeap *BestFitHeap::instance = nullptr;
 
-Heap *Heap::getInstance(int size) {
-    if (Heap::instance == nullptr) {
-        return new Heap(size);
+BestFitHeap *BestFitHeap::getInstance(int size) {
+    if (BestFitHeap::instance == nullptr) {
+        return new BestFitHeap(size);
     }
-    return Heap::instance;
+    return BestFitHeap::instance;
 }
 
-Heap *Heap::getInstance(int size, char *json) {
-    if (Heap::instance == nullptr) {
-        return new Heap(size, json);
+BestFitHeap *BestFitHeap::getInstance(int size, char *json) {
+    if (BestFitHeap::instance == nullptr) {
+        return new BestFitHeap(size, json);
     }
-    return Heap::instance;
+    return BestFitHeap::instance;
 }
 
-Heap::~Heap() {
+BestFitHeap::~BestFitHeap() {
     while (head != nullptr) {
         MemoryBlock *aux = head->getNext();
         delete head;
@@ -70,8 +70,8 @@ Heap::~Heap() {
     }
 }
 
-std::ostream& operator<<(std::ostream& os, const Heap& heap) {
-    os << "Heap: ";
+std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap) {
+    os << "BestFitHeap: ";
     MemoryBlock *aux = heap.head;
     while (aux != nullptr) {
         os << *aux;
@@ -81,7 +81,7 @@ std::ostream& operator<<(std::ostream& os, const Heap& heap) {
     return os;
 }
 
-MemoryBlock *Heap::myMalloc(int size) {
+MemoryBlock *BestFitHeap::myMalloc(int size) {
     size = (size + 7) & ~7;
     if (size == 0) {
         return nullptr;     
@@ -103,7 +103,7 @@ MemoryBlock *Heap::myMalloc(int size) {
     return best_fit;
 }
 
-MemoryBlock *Heap::myCalloc(int size) {
+MemoryBlock *BestFitHeap::myCalloc(int size) {
     size = (size + 7) & ~7;
     if (size == 0) {
         return nullptr;
@@ -125,7 +125,7 @@ MemoryBlock *Heap::myCalloc(int size) {
     return best_fit;
 }
 
-MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
+MemoryBlock *BestFitHeap::myRealloc(MemoryBlock *block, int size) {
     size = (size + 7) & ~7;
     if (block == nullptr) {
         return myMalloc(size);
@@ -149,7 +149,7 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
         }
         else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
             if (block->getSize() + prev->getSize() == size) {
-                Heap::setHead(block);
+                BestFitHeap::setHead(block);
             }
             block->joinPrev(size - block->getSize());
             return block;
@@ -164,7 +164,7 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
                 block->joinNext(size - block->getSize());
             }
             if (block->getPrev() == nullptr) {
-                Heap::setHead(block);
+                BestFitHeap::setHead(block);
             }
             return block;
         }
@@ -180,7 +180,7 @@ MemoryBlock *Heap::myRealloc(MemoryBlock *block, int size) {
     return nullptr;
 }
 
-void Heap::myFree(MemoryBlock *block) {
+void BestFitHeap::myFree(MemoryBlock *block) {
     if (block == nullptr || block->getStatus() == Status::FREE) {
         return;
     }
@@ -188,11 +188,11 @@ void Heap::myFree(MemoryBlock *block) {
     block->mergeNext();
     block->mergePrev();
     if (block->getPrev() == nullptr) {
-        Heap::setHead(block);
+        BestFitHeap::setHead(block);
     }
 }
 
-std::string serialize(const Heap& heap) {
+std::string serialize(const BestFitHeap& heap) {
     std::ostringstream ss;
     MemoryBlock *aux = heap.head;
     ss << "[";
