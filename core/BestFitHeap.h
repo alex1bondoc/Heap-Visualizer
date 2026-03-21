@@ -1,8 +1,8 @@
-#include "MemoryBlock.h"
 #include <iostream>
+#include "Heap.h"
 #include <string>
 
-class BestFitHeap{
+class BestFitHeap : Heap{
 private:
 
     BestFitHeap(int size); 

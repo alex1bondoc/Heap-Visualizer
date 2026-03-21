@@ -3,8 +3,8 @@
 #include <cstring>
 #include <iostream>
 
-BestFitHeap::BestFitHeap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
-BestFitHeap::BestFitHeap(int size, char *json) : size(size), head(nullptr){
+BestFitHeap::BestFitHeap(int size) : Heap(size), size(size), head(new MemoryBlock(size, Status::FREE)) {}; 
+BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json), size(size), head(nullptr){
     char *p = strtok(json, "[]");
     char *p2 = strtok(p, ",");
     MemoryBlock *aux = nullptr;
@@ -50,14 +50,14 @@ BestFitHeap *BestFitHeap::instance = nullptr;
 
 BestFitHeap *BestFitHeap::getInstance(int size) {
     if (BestFitHeap::instance == nullptr) {
-        return new BestFitHeap(size);
+        instance = new BestFitHeap(size);
     }
     return BestFitHeap::instance;
 }
 
 BestFitHeap *BestFitHeap::getInstance(int size, char *json) {
     if (BestFitHeap::instance == nullptr) {
-        return new BestFitHeap(size, json);
+        instance = new BestFitHeap(size, json);
     }
     return BestFitHeap::instance;
 }
