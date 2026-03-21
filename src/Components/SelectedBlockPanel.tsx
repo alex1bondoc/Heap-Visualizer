@@ -4,7 +4,7 @@ import {FreeFunctionContext, ReallocFunctionContext} from "./Contexts";
 export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
     const free = useContext(FreeFunctionContext);
     const realloc = useContext(ReallocFunctionContext);
-    const [size, setSize] = useState<number | null>(null);
+    const [size, setSize] = useState<number>(0);
     const handleChange = (event: any) => {
         const value = event.target.value.replace(/\D/g, '');
         if (Number(value) > 1024) {
