@@ -81,7 +81,7 @@ void Heap::myFree(MemoryBlock *block) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Heap& heap) {
-    os << "BestFitHeap: ";
+    std::cout << "Heap " << std::endl;
     MemoryBlock *aux = heap.head;
     while (aux != nullptr) {
         os << *aux;

@@ -4,7 +4,6 @@
 
 class BestFitHeap : Heap{
 private:
-
     BestFitHeap(int size); 
     BestFitHeap(int size, char *json);
     static BestFitHeap *instance; 
