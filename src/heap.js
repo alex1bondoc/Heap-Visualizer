@@ -1694,7 +1694,7 @@ var _wasmMalloc = Module['_wasmMalloc'] = makeInvalidEarlyAccess('_wasmMalloc');
 var _wasmFree = Module['_wasmFree'] = makeInvalidEarlyAccess('_wasmFree');
 var _wasmRealloc = Module['_wasmRealloc'] = makeInvalidEarlyAccess('_wasmRealloc');
 var _wasmReconstructHeap = Module['_wasmReconstructHeap'] = makeInvalidEarlyAccess('_wasmReconstructHeap');
-var _resetHeap = Module['_resetHeap'] = makeInvalidEarlyAccess('_resetHeap');
+var _wasmResetHeap = Module['_wasmResetHeap'] = makeInvalidEarlyAccess('_wasmResetHeap');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -1714,7 +1714,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['wasmFree'] != 'undefined', 'missing Wasm export: wasmFree');
   assert(typeof wasmExports['wasmRealloc'] != 'undefined', 'missing Wasm export: wasmRealloc');
   assert(typeof wasmExports['wasmReconstructHeap'] != 'undefined', 'missing Wasm export: wasmReconstructHeap');
-  assert(typeof wasmExports['resetHeap'] != 'undefined', 'missing Wasm export: resetHeap');
+  assert(typeof wasmExports['wasmResetHeap'] != 'undefined', 'missing Wasm export: wasmResetHeap');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
   assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
@@ -1731,7 +1731,7 @@ function assignWasmExports(wasmExports) {
   _wasmFree = Module['_wasmFree'] = createExportWrapper('wasmFree', 1);
   _wasmRealloc = Module['_wasmRealloc'] = createExportWrapper('wasmRealloc', 2);
   _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', 1);
-  _resetHeap = Module['_resetHeap'] = createExportWrapper('resetHeap', 0);
+  _wasmResetHeap = Module['_wasmResetHeap'] = createExportWrapper('wasmResetHeap', 0);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];

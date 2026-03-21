@@ -30,7 +30,8 @@ export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock,
                     value={size}
                     placeholder="Bytes..."></input> 
                     <button onClick={() =>  {realloc(block.id, size)
-                    setSize(0)}} className="w-1/4 bg-blue-400 rounded-xl">Realloc</button>
+                    setSize(0)
+                    onExit()}} className="w-1/4 bg-blue-400 rounded-xl">Realloc</button>
                 </div>
             : <></>}
         </div>

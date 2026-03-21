@@ -45,7 +45,7 @@ extern "C" {
         heap = BestFitHeap::getInstance(heap_size, json);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void resetHeap() {
+    const void wasmResetHeap() {
         delete heap;
         heap = BestFitHeap::getInstance(heap_size);
     }   
