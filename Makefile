@@ -9,7 +9,7 @@ clean-test:
 activate-wasm: 
 	/bin/fish ~/.emsdk/emsdk_env.fish
 compile-wasm: activate-wasm
-	emcc core/bridge.cpp core/Heap.cpp core/BestFitHeap.cpp core/MemoryBlock.cpp \
+	emcc core/bridge.cpp core/Heap.cpp core/FirstFitHeap.cpp core/MemoryBlock.cpp \
                                     -o src/heap.js  \
                                     -s WASM=1 \
                                     -s EXPORT_ES6=1 \

@@ -1,14 +1,11 @@
-#include "BestFitHeap.h"
-#include <sstream>
-#include <cstring>
-#include <iostream>
-
-BestFitHeap::BestFitHeap(int size) : Heap(size) {};
-BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json) {};
+#include "FirstFitHeap.h"
+#include "sstream"
+FirstFitHeap::FirstFitHeap(int size) : Heap(size) {};
+FirstFitHeap::FirstFitHeap(int size, char *json) : Heap(size, json) {};
 
 
-std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap) {
-    os << "BestFitHeap: ";
+std::ostream& operator<<(std::ostream& os, const FirstFitHeap& heap) {
+    os << "FirstFitHeap: ";
     MemoryBlock *aux = heap.head;
     while (aux != nullptr) {
         os << *aux;
@@ -18,18 +15,16 @@ std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap) {
     return os;
 }
 
-MemoryBlock *BestFitHeap::myMalloc(int size) {
+MemoryBlock *FirstFitHeap::myMalloc(int size) {
     size = (size + 7) & ~7;
     if (size == 0) {
         return nullptr;
     }
     MemoryBlock *aux = this->getHead();
     MemoryBlock *best_fit = nullptr;
-    while (aux != nullptr) {
+    while (aux != nullptr && best_fit == nullptr) {
         if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-            if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
-                best_fit = aux;
-            }
+            best_fit = aux;
         }
         aux = aux->getNext();
     }
@@ -40,18 +35,16 @@ MemoryBlock *BestFitHeap::myMalloc(int size) {
     return best_fit;
 }
 
-MemoryBlock *BestFitHeap::myCalloc(int size) {
+MemoryBlock *FirstFitHeap::myCalloc(int size) {
     size = (size + 7) & ~7;
     if (size == 0) {
         return nullptr;
     }
     MemoryBlock *aux = this->getHead();
     MemoryBlock *best_fit = nullptr;
-    while (aux != nullptr) {
+    while (aux != nullptr && best_fit == nullptr) {
         if (aux->getSize() >= size && aux->getStatus() == Status::FREE) {
-            if (best_fit == nullptr || aux->getSize() < best_fit->getSize()) {
-                best_fit = aux;
-            }
+            best_fit = aux;
         }
         aux = aux->getNext();
     }
@@ -62,7 +55,7 @@ MemoryBlock *BestFitHeap::myCalloc(int size) {
     return best_fit;
 }
 
-MemoryBlock *BestFitHeap::myRealloc(MemoryBlock *block, int size) {
+MemoryBlock *FirstFitHeap::myRealloc(MemoryBlock *block, int size) {
     size = (size + 7) & ~7;
     if (block == nullptr) {
         return myMalloc(size);
@@ -86,7 +79,7 @@ MemoryBlock *BestFitHeap::myRealloc(MemoryBlock *block, int size) {
         }
         else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
             if (block->getSize() + prev->getSize() == size) {
-                BestFitHeap::setHead(block);
+                FirstFitHeap::setHead(block);
             }
             block->joinPrev(size - block->getSize());
             return block;
@@ -101,7 +94,7 @@ MemoryBlock *BestFitHeap::myRealloc(MemoryBlock *block, int size) {
                 block->joinNext(size - block->getSize());
             }
             if (block->getPrev() == nullptr) {
-                BestFitHeap::setHead(block);
+                FirstFitHeap::setHead(block);
             }
             return block;
         }
@@ -117,7 +110,7 @@ MemoryBlock *BestFitHeap::myRealloc(MemoryBlock *block, int size) {
     return nullptr;
 }
 
-void BestFitHeap::myFree(MemoryBlock *block) {
+void FirstFitHeap::myFree(MemoryBlock *block) {
     if (block == nullptr || block->getStatus() == Status::FREE) {
         return;
     }
@@ -125,11 +118,11 @@ void BestFitHeap::myFree(MemoryBlock *block) {
     block->mergeNext();
     block->mergePrev();
     if (block->getPrev() == nullptr) {
-        BestFitHeap::setHead(block);
+        FirstFitHeap::setHead(block);
     }
 }
 
-std::string serialize(const BestFitHeap& heap) {
+std::string serialize(const FirstFitHeap& heap) {
     std::ostringstream ss;
     MemoryBlock *aux = heap.head;
     ss << "[";

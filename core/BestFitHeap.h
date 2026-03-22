@@ -2,9 +2,7 @@
 #include "Heap.h"
 #include <string>
 
-class BestFitHeap : Heap{
-private:
-
+class BestFitHeap : Heap {
 public:
     BestFitHeap(int size); 
     BestFitHeap(int size, char *json);
@@ -12,15 +10,6 @@ public:
     BestFitHeap operator= (const BestFitHeap&) = delete;
     
     friend std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap);
-
-    static BestFitHeap *getInstance(int size);
-    static BestFitHeap *getInstance(int size, char *json);
-
-    MemoryBlock *getHead() { return head; }
-    int getSize() { return size; }
-
-    void setHead(MemoryBlock *head) { this->head = head; }
-    void setSize(int size) { this->size = (size + 7) & ~7; }
 
     MemoryBlock *myMalloc(int size) override;
     MemoryBlock *myCalloc(int size) override;
