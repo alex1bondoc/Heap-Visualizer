@@ -1,5 +1,5 @@
 compile-test:
-	g++ core/main.cpp core/Heap.cpp core/BestFitHeap.cpp core/MemoryBlock.cpp -o core/main 
+	g++ core/main.cpp core/Manager.cpp -o core/main 
 run-test:
 	core/main
 memory-test:
@@ -9,7 +9,7 @@ clean-test:
 activate-wasm: 
 	/bin/fish ~/.emsdk/emsdk_env.fish
 compile-wasm: activate-wasm
-	emcc core/bridge.cpp core/Heap.cpp core/NextFitHeap.cpp core/MemoryBlock.cpp \
+	emcc core/bridge.cpp core/Manager.cpp core/MemoryBlock.cpp \
                                     -o src/heap.js  \
                                     -s WASM=1 \
                                     -s EXPORT_ES6=1 \

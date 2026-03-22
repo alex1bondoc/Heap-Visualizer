@@ -1,17 +1,14 @@
 #include <iostream>
 #include <cstring>
 #include <sstream>
-#include "BestFitHeap.h"
-
+#include "Manager.h"
 int main() {
-    Heap *heap = (Heap *)(BestFitHeap::getInstance(1024));
-    heap->myMalloc(128);
-    std::cout << serialize(*heap) << std::endl;
-    std::ostringstream jsonStream;
-    jsonStream << serialize(*heap);
-    delete heap;
-    char json[255];
-    strncpy(json, jsonStream.str().c_str(), 255 - 1);
-    std::cout << serialize(*Heap::getInstance(1024, json)) << std::endl;
+    Manager manager = Manager(1024);
+    manager.addHeap("FIRST_FIT");
+    manager.addHeap("NEXT_FIT");
+    manager.addHeap("BEST_FIT");
+    for (auto heap : manager.getHeaps()) {
+        std::cout << heap << std::endl;
+    }
     return 0;
 }
