@@ -1,5 +1,18 @@
 #include "HeapFactory.h"
 
+HeapType stringToHeapType(std::string type){
+    if (type == "FIRST_FIT") {
+        return HeapType::FIRST_FIT;
+    }
+    else if (type == "NEXT_FIT") {
+        return HeapType::NEXT_FIT;
+    }
+    else if (type == "BEST_FIT") {
+        return HeapType::BEST_FIT;
+    }
+    return HeapType::FIRST_FIT;
+}
+
 Heap *HeapFactory::createHeap(std::string type, int size) {
     HeapType t = stringToHeapType(type);
 
