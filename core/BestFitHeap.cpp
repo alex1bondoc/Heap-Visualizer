@@ -3,27 +3,10 @@
 #include <cstring>
 #include <iostream>
 
-BestFitHeap::BestFitHeap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
+BestFitHeap::BestFitHeap(int size) : Heap(size) {};
 BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json) {};
 
-BestFitHeap *BestFitHeap::instance = nullptr;
-
-BestFitHeap *BestFitHeap::getInstance(int size) {
-    if (BestFitHeap::instance == nullptr) {
-        BestFitHeap::instance = new BestFitHeap(size);
-    }
-    return BestFitHeap::instance;
-}
-
-BestFitHeap *BestFitHeap::getInstance(int size, char *json) {
-    if (BestFitHeap::instance == nullptr) {
-        instance = new BestFitHeap(size, json);
-    }
-    return BestFitHeap::instance;
-}
-
 BestFitHeap::~BestFitHeap() {
-    std::cout <<"bestfit heap" << std::endl;
     while (head != nullptr) {
         MemoryBlock *aux = head->getNext();
         delete head;

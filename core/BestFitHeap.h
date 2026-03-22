@@ -4,14 +4,13 @@
 
 class BestFitHeap : Heap{
 private:
-    BestFitHeap(int size); 
-    BestFitHeap(int size, char *json);
-    static BestFitHeap *instance; 
 
 public:
+    BestFitHeap(int size); 
+    BestFitHeap(int size, char *json);
     BestFitHeap (const BestFitHeap&) = delete;
     BestFitHeap operator= (const BestFitHeap&) = delete;
-    ~BestFitHeap();
+    ~BestFitHeap() override;
     
     friend std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap);
 

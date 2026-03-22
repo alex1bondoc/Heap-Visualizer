@@ -32,7 +32,6 @@ function App() {
             return;
         }
         const saved = localStorage.getItem("blocks");
-        console.log(saved);
         if (saved !== null) {
             wasmInstance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
         }
@@ -46,7 +45,6 @@ function App() {
         const json = JSON.parse(jsonString);
         setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status);}));
         localStorage.setItem("blocks", JSON.stringify(json));
-        console.log(json);
     };
     const malloc = (size: number) => {
         if (wasmInstance === null) {
@@ -71,11 +69,9 @@ function App() {
     };
     const reset = () => {
         if (wasmInstance === null) {
-            console.log("ok")
             return;
         }
         wasmInstance.ccall("wasmResetHeap", null, [], []);
-        console.log("ok");
         refreshBlocks();
     }
     return (

@@ -7,14 +7,17 @@
 #include "BestFitHeap.h"
 
 int heap_size = 1024;
-BestFitHeap *heap = BestFitHeap::getInstance(1024);
+BestFitHeap *heap = nullptr; 
 
 extern "C" {
+    
     EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeap() {
+        if (heap == nullptr) {
+            heap = new BestFitHeap(heap_size);
+        }
         static std::string json;
         json = serialize(*heap);
-        std::cout << json << std::endl;
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
@@ -43,11 +46,11 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;
-        heap = BestFitHeap::getInstance(heap_size, json);
+        heap = new BestFitHeap(1024, json);
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmResetHeap() {
         delete heap;
-        heap = BestFitHeap::getInstance(heap_size);
+        heap = new BestFitHeap(1024);
     }   
 }

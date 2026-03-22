@@ -43,21 +43,6 @@ Heap::Heap(int size, char *json) : size(size), head(nullptr){
         p2 = strtok(nullptr, ",");
     }
 }
-Heap *Heap::instance = nullptr;
-
-Heap *Heap::getInstance(int size) {
-    if (Heap::instance == nullptr) {
-        instance = new Heap(size);
-    }
-    return Heap::instance;
-}
-
-Heap *Heap::getInstance(int size, char *json) {
-    if (Heap::instance == nullptr) {
-        instance = new Heap(size, json);
-    }
-    return Heap::instance;
-}
 
 Heap::~Heap() {
     MemoryBlock *aux = head;
