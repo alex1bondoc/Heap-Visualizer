@@ -4,17 +4,17 @@
 #else
     #define EMSCRIPTEN_KEEPALIVE
 #endif
-#include "FirstFitHeap.h"
+#include "NextFitHeap.h"
 
 int heap_size = 1024;
-FirstFitHeap *heap = nullptr; 
+NextFitHeap *heap = nullptr; 
 
 extern "C" {
     
     EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeap() {
         if (heap == nullptr) {
-            heap = new FirstFitHeap(heap_size);
+            heap = new NextFitHeap(heap_size);
         }
         static std::string json;
         json = serialize(*heap);
@@ -47,11 +47,11 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         delete heap;
-        heap = new FirstFitHeap(1024, json);
+        heap = new NextFitHeap(1024, json);
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmResetHeap() {
         delete heap;
-        heap = new FirstFitHeap(1024);
+        heap = new NextFitHeap(1024);
     }   
 }
