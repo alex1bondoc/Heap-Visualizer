@@ -6,13 +6,6 @@
 BestFitHeap::BestFitHeap(int size) : Heap(size) {};
 BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json) {};
 
-BestFitHeap::~BestFitHeap() {
-    while (head != nullptr) {
-        MemoryBlock *aux = head->getNext();
-        delete head;
-        head = aux;
-    }
-}
 
 std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap) {
     os << "BestFitHeap: ";
