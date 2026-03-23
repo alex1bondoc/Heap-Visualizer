@@ -77,16 +77,18 @@ function App() {
     return (
         <div className="flex flex-col h-screen w-full bg-slate-900 center ">
             <Header size={heapSize}></Header>
-            <ReallocFunctionContext value={realloc}>
-                <FreeFunctionContext value={free}>
-                    <Heap size={heapSize} blocks={blocks}></Heap>
-                </FreeFunctionContext>
-            </ReallocFunctionContext>
-            <ResetFunctionContext value={reset}>
-                <MallocFunctionContext value={malloc}>
-                    <ControlPanel></ControlPanel>
-                </MallocFunctionContext>
-            </ResetFunctionContext>
+            <div className="border-4 w-full h-1/3 border-slate-100 rounded-xl">
+                <ReallocFunctionContext value={realloc}>
+                    <FreeFunctionContext value={free}>
+                        <Heap size={heapSize} blocks={blocks}></Heap>
+                    </FreeFunctionContext>
+                </ReallocFunctionContext>
+                <ResetFunctionContext value={reset}>
+                    <MallocFunctionContext value={malloc}>
+                        <ControlPanel></ControlPanel>
+                    </MallocFunctionContext>
+                </ResetFunctionContext>
+            </div>
         </div>
     );
 }
