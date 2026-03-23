@@ -96,6 +96,7 @@ MemoryBlock *NextFitHeap::myRealloc(MemoryBlock *block, int size) {
         return nullptr;
     }
     if (size <= block->getSize()) {
+        last_allocated = block;
         return block->splitBlock(size);
     }
     else{

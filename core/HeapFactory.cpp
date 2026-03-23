@@ -31,12 +31,12 @@ Heap *HeapFactory::createHeap(std::string type, int size) {
             break;
     }
 }
-static BestFitHeap *createBestFitHeap(int size) {
+BestFitHeap *HeapFactory::createBestFitHeap(int size) {
     return new BestFitHeap(size);
 }
-static FirstFitHeap *createFirstFitHeap(int size) {
+FirstFitHeap *HeapFactory::createFirstFitHeap(int size) {
     return new FirstFitHeap(size);
 }
-static NextFitHeap *createNextFitHeap(int size) {
+NextFitHeap *HeapFactory::createNextFitHeap(int size) {
     return new NextFitHeap(size);
 }
