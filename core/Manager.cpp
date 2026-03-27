@@ -21,9 +21,16 @@ void Manager::deleteHeap(int index){
 std::string Manager::serialize() {
     std::ostringstream ss;
     int heapCounter = this->heaps.size();
-    ss << "{ " << "\"NumberOfHeaps: \"" << heapCounter << ", [ ";
+    ss << "{ " << "\"NumberOfHeaps\": " << heapCounter << ", \"heaps\": [ ";
+    int i{0};
     for (Heap* heap : this->heaps) {
+        ss << heap->serialize();
+        if (i != heapCounter - 1) {
+            ss << ",";
+        }
+        i += 1;
     }
+    ss << "] }";
 
     return ss.str();
 
