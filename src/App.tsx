@@ -31,7 +31,7 @@ function App() {
         if (wasmInstance === null) {
             return;
         }
-        const saved = localStorage.getItem("blocks");
+        const saved = localStorage.getItem("cariceps");
         if (saved !== null) {
             wasmInstance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
         }

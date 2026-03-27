@@ -3,11 +3,11 @@
 
 class Heap{
 protected:
-    Heap(int size);
-    Heap(int size, char *json);
     MemoryBlock *head;
     int size;
 public:
+    Heap(int size);
+    Heap(int size, char *json);
     Heap (const Heap&) = delete;
     virtual Heap operator= (const Heap&) = delete;
     virtual ~Heap();

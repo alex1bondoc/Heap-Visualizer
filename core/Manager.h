@@ -3,8 +3,8 @@
 
 class Manager {
 private:
-    std::vector<Heap *> heaps;
-    int heap_size;
+    std::vector<Heap *> heaps{};
+    int heap_size{};
 public:
     Manager(int heap_size);
     ~Manager();

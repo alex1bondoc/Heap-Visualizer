@@ -1,7 +1,7 @@
 #include "Manager.h"
 #include <sstream>
 
-Manager::Manager(int heap_size) : heap_size(heap_size), heaps({}) {};
+Manager::Manager(int heap_size) : heap_size(heap_size) {};
 
 Manager::~Manager() {
     for (const Heap* heap : this->heaps) {

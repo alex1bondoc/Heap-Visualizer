@@ -7,8 +7,6 @@
 #include "Manager.h"
 
 int heap_size = 1024;
-NextFitHeap *heap = nullptr; 
-
 Manager* manager = nullptr;
 
 extern "C" {
@@ -34,15 +32,14 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeaps() {
-        if (manager == nullptr) {
-            wasmCreateManager();
-        }
+        wasmCreateManager();
+        std::cout << manager->serialize() << std::endl;
         static std::string json = manager->serialize();
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeap() {
-        if (manager->getHeaps().size() == 0) {
+        if (manager == nullptr) {
             wasmCreateManager();
             wasmAddHeap("BEST_FIT");
         }
@@ -76,13 +73,15 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
-        delete heap;
-        heap = new NextFitHeap(1024, json);
+        wasmCreateManager();
+        manager->getHeaps().push_back((Heap*)(new BestFitHeap(1024, json)));
+        std::cout << manager->serialize() << std::endl;
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmResetHeap() {
+        Heap* heap = manager->getHeaps()[0];
         delete heap;
-        heap = new NextFitHeap(1024);
+        wasmAddHeap("BEST_FIT");
     }
 
 }
