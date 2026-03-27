@@ -7,6 +7,7 @@ private:
     int heap_size;
 public:
     Manager(int heap_size);
+    ~Manager();
     
     std::vector<Heap *> getHeaps() { return heaps; }
     int getHeapSize() { return heap_size; }
@@ -16,4 +17,6 @@ public:
 
     void addHeap(std::string type);
     void deleteHeap(int index);
+
+    friend std::string serialize(const Manager& manager);
 };

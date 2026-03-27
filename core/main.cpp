@@ -1,7 +1,9 @@
 #include <iostream>
 #include <cstring>
 #include <sstream>
+
 #include "Manager.h"
+
 int main() {
     Manager manager = Manager(1024);
     manager.addHeap("FIRST_FIT");

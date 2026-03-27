@@ -720,6 +720,75 @@ async function createWasm() {
 
   
 
+  class ExceptionInfo {
+      // excPtr - Thrown object pointer to wrap. Metadata pointer is calculated from it.
+      constructor(excPtr) {
+        this.excPtr = excPtr;
+        this.ptr = excPtr - 24;
+      }
+  
+      set_type(type) {
+        HEAPU32[(((this.ptr)+(4))>>2)] = type;
+      }
+  
+      get_type() {
+        return HEAPU32[(((this.ptr)+(4))>>2)];
+      }
+  
+      set_destructor(destructor) {
+        HEAPU32[(((this.ptr)+(8))>>2)] = destructor;
+      }
+  
+      get_destructor() {
+        return HEAPU32[(((this.ptr)+(8))>>2)];
+      }
+  
+      set_caught(caught) {
+        caught = caught ? 1 : 0;
+        HEAP8[(this.ptr)+(12)] = caught;
+      }
+  
+      get_caught() {
+        return HEAP8[(this.ptr)+(12)] != 0;
+      }
+  
+      set_rethrown(rethrown) {
+        rethrown = rethrown ? 1 : 0;
+        HEAP8[(this.ptr)+(13)] = rethrown;
+      }
+  
+      get_rethrown() {
+        return HEAP8[(this.ptr)+(13)] != 0;
+      }
+  
+      // Initialize native structure fields. Should be called once after allocated.
+      init(type, destructor) {
+        this.set_adjusted_ptr(0);
+        this.set_type(type);
+        this.set_destructor(destructor);
+      }
+  
+      set_adjusted_ptr(adjustedPtr) {
+        HEAPU32[(((this.ptr)+(16))>>2)] = adjustedPtr;
+      }
+  
+      get_adjusted_ptr() {
+        return HEAPU32[(((this.ptr)+(16))>>2)];
+      }
+    }
+  
+  var exceptionLast = 0;
+  
+  var uncaughtExceptionCount = 0;
+  var ___cxa_throw = (ptr, type, destructor) => {
+      var info = new ExceptionInfo(ptr);
+      // Initialize ExceptionInfo content after it was allocated in __cxa_allocate_exception.
+      info.init(type, destructor);
+      exceptionLast = ptr;
+      uncaughtExceptionCount++;
+      assert(false, 'Exception thrown, but exception catching is not enabled. Compile with -sNO_DISABLE_EXCEPTION_CATCHING or -sEXCEPTION_CATCHING_ALLOWED=[..] to catch.');
+    };
+
   var __abort_js = () =>
       abort('native code called abort()');
 
@@ -4045,7 +4114,6 @@ if (Module['wasmBinary']) wasmBinary = Module['wasmBinary'];
   'makePromise',
   'idsToPromises',
   'makePromiseCallback',
-  'ExceptionInfo',
   'findMatchingCatch',
   'Browser_asyncPrepareDataCounter',
   'isLeapYear',
@@ -4174,6 +4242,7 @@ missingLibrarySymbols.forEach(missingLibrarySymbol)
   'uncaughtExceptionCount',
   'exceptionLast',
   'exceptionCaught',
+  'ExceptionInfo',
   'Browser',
   'requestFullscreen',
   'requestFullScreen',
@@ -4350,6 +4419,10 @@ var _wasmFree = Module['_wasmFree'] = makeInvalidEarlyAccess('_wasmFree');
 var _wasmRealloc = Module['_wasmRealloc'] = makeInvalidEarlyAccess('_wasmRealloc');
 var _wasmReconstructHeap = Module['_wasmReconstructHeap'] = makeInvalidEarlyAccess('_wasmReconstructHeap');
 var _wasmResetHeap = Module['_wasmResetHeap'] = makeInvalidEarlyAccess('_wasmResetHeap');
+var _createManager = Module['_createManager'] = makeInvalidEarlyAccess('_createManager');
+var _addHead = Module['_addHead'] = makeInvalidEarlyAccess('_addHead');
+var _deleteHeap = Module['_deleteHeap'] = makeInvalidEarlyAccess('_deleteHeap');
+var _getHeaps = Module['_getHeaps'] = makeInvalidEarlyAccess('_getHeaps');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -4370,6 +4443,10 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['wasmRealloc'] != 'undefined', 'missing Wasm export: wasmRealloc');
   assert(typeof wasmExports['wasmReconstructHeap'] != 'undefined', 'missing Wasm export: wasmReconstructHeap');
   assert(typeof wasmExports['wasmResetHeap'] != 'undefined', 'missing Wasm export: wasmResetHeap');
+  assert(typeof wasmExports['createManager'] != 'undefined', 'missing Wasm export: createManager');
+  assert(typeof wasmExports['addHead'] != 'undefined', 'missing Wasm export: addHead');
+  assert(typeof wasmExports['deleteHeap'] != 'undefined', 'missing Wasm export: deleteHeap');
+  assert(typeof wasmExports['getHeaps'] != 'undefined', 'missing Wasm export: getHeaps');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
   assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
@@ -4387,6 +4464,10 @@ function assignWasmExports(wasmExports) {
   _wasmRealloc = Module['_wasmRealloc'] = createExportWrapper('wasmRealloc', 2);
   _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', 1);
   _wasmResetHeap = Module['_wasmResetHeap'] = createExportWrapper('wasmResetHeap', 0);
+  _createManager = Module['_createManager'] = createExportWrapper('createManager', 0);
+  _addHead = Module['_addHead'] = createExportWrapper('addHead', 1);
+  _deleteHeap = Module['_deleteHeap'] = createExportWrapper('deleteHeap', 1);
+  _getHeaps = Module['_getHeaps'] = createExportWrapper('getHeaps', 0);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];
@@ -4401,6 +4482,8 @@ function assignWasmExports(wasmExports) {
 }
 
 var wasmImports = {
+  /** @export */
+  __cxa_throw: ___cxa_throw,
   /** @export */
   _abort_js: __abort_js,
   /** @export */
