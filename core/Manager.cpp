@@ -5,7 +5,7 @@ Manager::Manager(int heap_size) : heap_size(heap_size), heaps({}) {};
 
 Manager::~Manager() {
     for (const Heap* heap : this->heaps) {
-        delete &heap;
+        delete heap;
     }; 
     this->heaps.clear();
 }
