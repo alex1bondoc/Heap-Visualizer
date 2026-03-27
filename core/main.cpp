@@ -10,7 +10,7 @@ int main() {
     manager.addHeap("NEXT_FIT");
     manager.addHeap("BEST_FIT");
     for (auto heap : manager.getHeaps()) {
-        std::cout << *heap << std::endl;
+        std::cout << heap->serialize() << std::endl;
     }
     return 0;
 }

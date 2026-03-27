@@ -158,12 +158,12 @@ void NextFitHeap::myFree(MemoryBlock *block) {
     }
 }
 
-std::string serialize(const NextFitHeap& heap) {
+std::string NextFitHeap::serialize() {
     std::ostringstream ss;
-    MemoryBlock *aux = heap.head;
+    MemoryBlock *aux = this->head;
     ss << "[";
     while (aux != nullptr) {
-        ss << serialize(*aux);
+        ss << aux->serialize();
         aux = aux->getNext();
         if (aux != nullptr) {
             ss << ",";

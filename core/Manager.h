@@ -18,5 +18,5 @@ public:
     void addHeap(std::string type);
     void deleteHeap(int index);
 
-    friend std::string serialize(const Manager& manager);
+    std::string serialize();
 };

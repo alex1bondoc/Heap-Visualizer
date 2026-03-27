@@ -18,11 +18,11 @@ void Manager::deleteHeap(int index){
     advance(it, index);
     this->heaps.erase(it);
 }
-std::string serialize(const Manager& manager) {
+std::string Manager::serialize() {
     std::ostringstream ss;
-    int heapCounter = manager.heaps.size();
+    int heapCounter = this->heaps.size();
     ss << "{ " << "\"NumberOfHeaps: \"" << heapCounter << ", [ ";
-    for (Heap* heap : manager.heaps) {
+    for (Heap* heap : this->heaps) {
     }
 
     return ss.str();

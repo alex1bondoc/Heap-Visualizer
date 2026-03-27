@@ -17,5 +17,5 @@ public:
     MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
     void myFree(MemoryBlock *block) override;
 
-    friend std::string serialize(const NextFitHeap& heap);
+    std::string serialize() override;
 };

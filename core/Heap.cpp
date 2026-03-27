@@ -76,12 +76,12 @@ std::ostream& operator<<(std::ostream& os, const Heap& heap) {
     return os;
 }
 
-std::string serialize(const Heap& heap) {
+std::string Heap::serialize() {
     std::ostringstream ss;
-    MemoryBlock *aux = heap.head;
+    MemoryBlock *aux = this->head;
     ss << "[";
     while (aux != nullptr) {
-        ss << serialize(*aux);
+        ss << aux->serialize();
         aux = aux->getNext();
         if (aux != nullptr) {
             ss << ",";

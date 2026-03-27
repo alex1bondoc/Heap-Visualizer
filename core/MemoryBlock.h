@@ -48,5 +48,5 @@ public:
     void mergeNext(); 
     void mergePrev(); 
 
-    friend std::string serialize(const MemoryBlock& memory_block);
+    std::string serialize();
 };

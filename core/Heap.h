@@ -25,5 +25,5 @@ public:
     virtual MemoryBlock *myRealloc(MemoryBlock *block, int size);
     virtual void myFree(MemoryBlock *block);
 
-    friend std::string serialize(const Heap& heap);
+    virtual std::string serialize();
 };

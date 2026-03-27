@@ -129,12 +129,12 @@ void BestFitHeap::myFree(MemoryBlock *block) {
     }
 }
 
-std::string serialize(const BestFitHeap& heap) {
+std::string BestFitHeap::serialize() {
     std::ostringstream ss;
-    MemoryBlock *aux = heap.head;
+    MemoryBlock *aux = this->head;
     ss << "[";
     while (aux != nullptr) {
-        ss << serialize(*aux);
+        ss << aux->serialize();
         aux = aux->getNext();
         if (aux != nullptr) {
             ss << ",";

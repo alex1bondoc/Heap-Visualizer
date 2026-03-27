@@ -122,12 +122,12 @@ void FirstFitHeap::myFree(MemoryBlock *block) {
     }
 }
 
-std::string serialize(const FirstFitHeap& heap) {
+std::string FirstFitHeap::serialize() {
     std::ostringstream ss;
-    MemoryBlock *aux = heap.head;
+    MemoryBlock *aux = this->head;
     ss << "[";
     while (aux != nullptr) {
-        ss << serialize(*aux);
+        ss << aux->serialize();
         aux = aux->getNext();
         if (aux != nullptr) {
             ss << ",";
