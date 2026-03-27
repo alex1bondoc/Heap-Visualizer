@@ -4413,16 +4413,16 @@ function checkIncomingModuleAPI() {
 }
 
 // Imports from the Wasm binary.
+var _wasmCreateManager = Module['_wasmCreateManager'] = makeInvalidEarlyAccess('_wasmCreateManager');
+var _wasmAddHeap = Module['_wasmAddHeap'] = makeInvalidEarlyAccess('_wasmAddHeap');
+var _wasmDeleteHeap = Module['_wasmDeleteHeap'] = makeInvalidEarlyAccess('_wasmDeleteHeap');
+var _wasmGetHeaps = Module['_wasmGetHeaps'] = makeInvalidEarlyAccess('_wasmGetHeaps');
 var _wasmGetHeap = Module['_wasmGetHeap'] = makeInvalidEarlyAccess('_wasmGetHeap');
 var _wasmMalloc = Module['_wasmMalloc'] = makeInvalidEarlyAccess('_wasmMalloc');
 var _wasmFree = Module['_wasmFree'] = makeInvalidEarlyAccess('_wasmFree');
 var _wasmRealloc = Module['_wasmRealloc'] = makeInvalidEarlyAccess('_wasmRealloc');
 var _wasmReconstructHeap = Module['_wasmReconstructHeap'] = makeInvalidEarlyAccess('_wasmReconstructHeap');
 var _wasmResetHeap = Module['_wasmResetHeap'] = makeInvalidEarlyAccess('_wasmResetHeap');
-var _createManager = Module['_createManager'] = makeInvalidEarlyAccess('_createManager');
-var _addHead = Module['_addHead'] = makeInvalidEarlyAccess('_addHead');
-var _deleteHeap = Module['_deleteHeap'] = makeInvalidEarlyAccess('_deleteHeap');
-var _getHeaps = Module['_getHeaps'] = makeInvalidEarlyAccess('_getHeaps');
 var _fflush = makeInvalidEarlyAccess('_fflush');
 var _strerror = makeInvalidEarlyAccess('_strerror');
 var _emscripten_stack_init = makeInvalidEarlyAccess('_emscripten_stack_init');
@@ -4437,16 +4437,16 @@ var __indirect_function_table = makeInvalidEarlyAccess('__indirect_function_tabl
 var wasmMemory = makeInvalidEarlyAccess('wasmMemory');
 
 function assignWasmExports(wasmExports) {
+  assert(typeof wasmExports['wasmCreateManager'] != 'undefined', 'missing Wasm export: wasmCreateManager');
+  assert(typeof wasmExports['wasmAddHeap'] != 'undefined', 'missing Wasm export: wasmAddHeap');
+  assert(typeof wasmExports['wasmDeleteHeap'] != 'undefined', 'missing Wasm export: wasmDeleteHeap');
+  assert(typeof wasmExports['wasmGetHeaps'] != 'undefined', 'missing Wasm export: wasmGetHeaps');
   assert(typeof wasmExports['wasmGetHeap'] != 'undefined', 'missing Wasm export: wasmGetHeap');
   assert(typeof wasmExports['wasmMalloc'] != 'undefined', 'missing Wasm export: wasmMalloc');
   assert(typeof wasmExports['wasmFree'] != 'undefined', 'missing Wasm export: wasmFree');
   assert(typeof wasmExports['wasmRealloc'] != 'undefined', 'missing Wasm export: wasmRealloc');
   assert(typeof wasmExports['wasmReconstructHeap'] != 'undefined', 'missing Wasm export: wasmReconstructHeap');
   assert(typeof wasmExports['wasmResetHeap'] != 'undefined', 'missing Wasm export: wasmResetHeap');
-  assert(typeof wasmExports['createManager'] != 'undefined', 'missing Wasm export: createManager');
-  assert(typeof wasmExports['addHead'] != 'undefined', 'missing Wasm export: addHead');
-  assert(typeof wasmExports['deleteHeap'] != 'undefined', 'missing Wasm export: deleteHeap');
-  assert(typeof wasmExports['getHeaps'] != 'undefined', 'missing Wasm export: getHeaps');
   assert(typeof wasmExports['fflush'] != 'undefined', 'missing Wasm export: fflush');
   assert(typeof wasmExports['strerror'] != 'undefined', 'missing Wasm export: strerror');
   assert(typeof wasmExports['emscripten_stack_init'] != 'undefined', 'missing Wasm export: emscripten_stack_init');
@@ -4458,16 +4458,16 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['emscripten_stack_get_current'] != 'undefined', 'missing Wasm export: emscripten_stack_get_current');
   assert(typeof wasmExports['memory'] != 'undefined', 'missing Wasm export: memory');
   assert(typeof wasmExports['__indirect_function_table'] != 'undefined', 'missing Wasm export: __indirect_function_table');
+  _wasmCreateManager = Module['_wasmCreateManager'] = createExportWrapper('wasmCreateManager', 0);
+  _wasmAddHeap = Module['_wasmAddHeap'] = createExportWrapper('wasmAddHeap', 1);
+  _wasmDeleteHeap = Module['_wasmDeleteHeap'] = createExportWrapper('wasmDeleteHeap', 1);
+  _wasmGetHeaps = Module['_wasmGetHeaps'] = createExportWrapper('wasmGetHeaps', 0);
   _wasmGetHeap = Module['_wasmGetHeap'] = createExportWrapper('wasmGetHeap', 0);
   _wasmMalloc = Module['_wasmMalloc'] = createExportWrapper('wasmMalloc', 1);
   _wasmFree = Module['_wasmFree'] = createExportWrapper('wasmFree', 1);
   _wasmRealloc = Module['_wasmRealloc'] = createExportWrapper('wasmRealloc', 2);
   _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', 1);
   _wasmResetHeap = Module['_wasmResetHeap'] = createExportWrapper('wasmResetHeap', 0);
-  _createManager = Module['_createManager'] = createExportWrapper('createManager', 0);
-  _addHead = Module['_addHead'] = createExportWrapper('addHead', 1);
-  _deleteHeap = Module['_deleteHeap'] = createExportWrapper('deleteHeap', 1);
-  _getHeaps = Module['_getHeaps'] = createExportWrapper('getHeaps', 0);
   _fflush = createExportWrapper('fflush', 1);
   _strerror = createExportWrapper('strerror', 1);
   _emscripten_stack_init = wasmExports['emscripten_stack_init'];
