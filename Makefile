@@ -7,7 +7,7 @@ memory-test:
 clean-test:
 	rm -f core/main
 activate-wasm: 
-	/bin/fish ~/.emsdk/emsdk_env.fish
+	/bin/bash ~/.emsdk/emsdk_env.sh
 compile-wasm: activate-wasm
 	emcc core/bridge.cpp  core/MemoryBlock.cpp core/Heap.cpp core/BestFitHeap.cpp core/HeapFactory.cpp core/FirstFitHeap.cpp core/NextFitHeap.cpp core/Manager.cpp\
                                     -o src/heap.js  \
