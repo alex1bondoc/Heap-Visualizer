@@ -23,7 +23,7 @@ function App() {
 
     useEffect(() => {
         createHeapModule({
-        locateFile: () => "heap.wasm",
+        locateFile: () => `${import.meta.env.BASE_URL}heap.wasm`,
         }).then((instance: any) => {
             setWasmInstance(instance);
         });
