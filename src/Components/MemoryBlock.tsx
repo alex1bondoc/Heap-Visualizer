@@ -1,6 +1,4 @@
 export type Status = 'FREE' | 'ALLOC';
-import {useState} from 'react';
-import {SelectedBlockPanel} from './SelectedBlockPanel';
 export class MemoryBlock {
     public id: string;
     public status: Status;

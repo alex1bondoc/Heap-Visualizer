@@ -1,7 +1,7 @@
 import {MemoryBlock} from "./MemoryBlock";
 import {useState, useContext} from 'react';
 import {FreeFunctionContext, ReallocFunctionContext} from "./Contexts";
-export function SelectedBlockPanel({block, maxSize, onHover, onExit}:{block: MemoryBlock, maxSize: number, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
+export function SelectedBlockPanel({block, maxSize, onExit}:{block: MemoryBlock, maxSize: number, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
     const free = useContext(FreeFunctionContext);
     const realloc = useContext(ReallocFunctionContext);
     const [size, setSize] = useState<number>(0);
