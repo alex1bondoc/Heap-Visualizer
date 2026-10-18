@@ -4549,7 +4549,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['memory'] != 'undefined', 'missing Wasm export: memory');
   assert(typeof wasmExports['__indirect_function_table'] != 'undefined', 'missing Wasm export: __indirect_function_table');
   _wasmCreateManager = Module['_wasmCreateManager'] = createExportWrapper('wasmCreateManager', wasmExports['wasmCreateManager'], 0);
-  _wasmAddHeap = Module['_wasmAddHeap'] = createExportWrapper('wasmAddHeap', wasmExports['wasmAddHeap'], 1);
+  _wasmAddHeap = Module['_wasmAddHeap'] = createExportWrapper('wasmAddHeap', wasmExports['wasmAddHeap'], 2);
   _wasmDeleteHeap = Module['_wasmDeleteHeap'] = createExportWrapper('wasmDeleteHeap', wasmExports['wasmDeleteHeap'], 1);
   _wasmSetHeapSize = Module['_wasmSetHeapSize'] = createExportWrapper('wasmSetHeapSize', wasmExports['wasmSetHeapSize'], 1);
   _wasmClearHeaps = Module['_wasmClearHeaps'] = createExportWrapper('wasmClearHeaps', wasmExports['wasmClearHeaps'], 0);
@@ -4557,7 +4557,7 @@ function assignWasmExports(wasmExports) {
   _wasmMalloc = Module['_wasmMalloc'] = createExportWrapper('wasmMalloc', wasmExports['wasmMalloc'], 2);
   _wasmFree = Module['_wasmFree'] = createExportWrapper('wasmFree', wasmExports['wasmFree'], 2);
   _wasmRealloc = Module['_wasmRealloc'] = createExportWrapper('wasmRealloc', wasmExports['wasmRealloc'], 3);
-  _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', wasmExports['wasmReconstructHeap'], 2);
+  _wasmReconstructHeap = Module['_wasmReconstructHeap'] = createExportWrapper('wasmReconstructHeap', wasmExports['wasmReconstructHeap'], 3);
   _wasmResetHeap = Module['_wasmResetHeap'] = createExportWrapper('wasmResetHeap', wasmExports['wasmResetHeap'], 1);
   _fflush = createExportWrapper('fflush', wasmExports['fflush'], 1);
   _strerror = createExportWrapper('strerror', wasmExports['strerror'], 1);

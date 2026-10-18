@@ -1,16 +1,37 @@
 #include "BuddyHeap.h"
 
-// A heap whose size is not a power of two starts as its binary decomposition
-// (e.g. 1000 = 512 + 256 + 128 + 64 + 32 + 8). Each piece is aligned to its size,
-// so the offset XOR size rule still finds the right buddy.
 BuddyHeap::BuddyHeap(int size) : Heap(size) {
+    this->createTopBlocks();
+};
+
+// The saved JSON only has sizes, so the buddy links are rebuilt
+// by replaying the same splits that produced those blocks.
+BuddyHeap::BuddyHeap(int size, char *json) : Heap(size) {
+    this->createTopBlocks();
+    Heap saved(size, json);
+    MemoryBlock *target = saved.getHead();
+    MemoryBlock *current = this->getHead();
+    while (target != nullptr && current != nullptr) {
+        while (current->getSize() > target->getSize()) {
+            this->splitHalf(current);
+        }
+        current->setStatus(target->getStatus());
+        current = current->getNext();
+        target = target->getNext();
+    }
+};
+
+// A heap whose size is not a power of two starts as its binary decomposition
+// (e.g. 1000 = 512 + 256 + 128 + 64 + 32 + 8). These top blocks have no buddy,
+// so they are never merged with each other.
+void BuddyHeap::createTopBlocks() {
     delete this->head;
     this->head = nullptr;
     MemoryBlock *last = nullptr;
     int offset = 0;
-    while (offset < size) {
+    while (offset < this->getSize()) {
         int block_size = 1;
-        while (block_size * 2 <= size - offset) {
+        while (block_size * 2 <= this->getSize() - offset) {
             block_size *= 2;
         }
         MemoryBlock *block = new MemoryBlock(block_size, Status::FREE, nullptr, last);
@@ -23,8 +44,7 @@ BuddyHeap::BuddyHeap(int size) : Heap(size) {
         last = block;
         offset += block_size;
     }
-};
-BuddyHeap::BuddyHeap(int size, char *json) : Heap(size, json) {};
+}
 
 int roundToPowerOfTwo(int size, int minimum) {
     int power = minimum;
@@ -34,44 +54,37 @@ int roundToPowerOfTwo(int size, int minimum) {
     return power;
 }
 
-int BuddyHeap::offsetOf(MemoryBlock *block) {
-    int offset = 0;
-    MemoryBlock *aux = this->getHead();
-    while (aux != nullptr && aux != block) {
-        offset += aux->getSize();
-        aux = aux->getNext();
-    }
-    return offset;
-}
-
-// The buddy of a block of size s at offset o lives at o XOR s,
-// so it is always the direct neighbour on one side.
-MemoryBlock *BuddyHeap::getBuddy(MemoryBlock *block) {
-    if (block->getSize() >= this->getSize()) {
-        return nullptr;
-    }
-    int offset = this->offsetOf(block);
-    int buddyOffset = offset ^ block->getSize();
-    MemoryBlock *buddy = buddyOffset > offset ? block->getNext() : block->getPrev();
-    if (buddy == nullptr || buddy->getSize() != block->getSize()) {
-        return nullptr;
-    }
-    return buddy;
-}
-
+// block keeps the left half and the new right half becomes its buddy.
+// The right half remembers block's old buddy so a later merge can restore it.
 void BuddyHeap::splitHalf(MemoryBlock *block) {
     int half = block->getSize() / 2;
-    MemoryBlock *buddy = new MemoryBlock(half, Status::FREE, block->getNext(), block);
+    MemoryBlock *right = new MemoryBlock(half, Status::FREE, block->getNext(), block);
     if (block->getNext() != nullptr) {
-        block->getNext()->setPrev(buddy);
+        block->getNext()->setPrev(right);
     }
-    block->setNext(buddy);
+    block->setNext(right);
     block->setSize(half);
+
+    right->setParentBuddy(block->getBuddy());
+    right->setBuddy(block);
+    block->setBuddy(right);
 }
 
-void BuddyHeap::mergeWithNext(MemoryBlock *block) {
-    block->setSize(block->getSize() * 2);
-    block->getNext()->removeCurrent();
+bool BuddyHeap::canMerge(MemoryBlock *block) {
+    MemoryBlock *buddy = block->getBuddy();
+    return buddy != nullptr && buddy->getStatus() == Status::FREE && buddy->getSize() == block->getSize();
+}
+
+// Joins block with its buddy into the left one and gives it back
+// the buddy it had before they were split.
+MemoryBlock *BuddyHeap::mergeWithBuddy(MemoryBlock *block) {
+    MemoryBlock *buddy = block->getBuddy();
+    MemoryBlock *left = block->getNext() == buddy ? block : buddy;
+    MemoryBlock *right = left == block ? buddy : block;
+    left->setSize(left->getSize() * 2);
+    left->setBuddy(right->getParentBuddy());
+    right->removeCurrent();
+    return left;
 }
 
 MemoryBlock *BuddyHeap::myMalloc(int size) {
@@ -121,36 +134,24 @@ MemoryBlock *BuddyHeap::myRealloc(MemoryBlock *block, int size) {
         }
         return block;
     }
-    // Grow in place only while the block is the left half and its right buddy is free.
-    int offset = this->offsetOf(block);
+    // Grow in place only if, at every level, block is the left half
+    // and its buddy (the right half) is completely free.
     int current = block->getSize();
-    MemoryBlock *aux = block->getNext();
+    MemoryBlock *buddy = block->getBuddy();
+    MemoryBlock *right_neighbour = block->getNext();
     bool canGrow = true;
     while (current < needed) {
-        if (offset % (current * 2) != 0 || current * 2 > this->getSize()) {
+        if (buddy == nullptr || buddy != right_neighbour || buddy->getStatus() != Status::FREE || buddy->getSize() != current) {
             canGrow = false;
             break;
         }
-        int covered = 0;
-        while (aux != nullptr && covered < current && aux->getStatus() == Status::FREE) {
-            covered += aux->getSize();
-            aux = aux->getNext();
-        }
-        if (covered != current) {
-            canGrow = false;
-            break;
-        }
+        right_neighbour = buddy->getNext();
+        buddy = buddy->getParentBuddy();
         current *= 2;
     }
     if (canGrow) {
         while (block->getSize() < needed) {
-            MemoryBlock *buddy = block->getNext();
-            while (buddy->getSize() < block->getSize()) {
-                // The free right half may still be split into smaller buddies.
-                buddy->setSize(buddy->getSize() + buddy->getNext()->getSize());
-                buddy->getNext()->removeCurrent();
-            }
-            this->mergeWithNext(block);
+            this->mergeWithBuddy(block);
         }
         return block;
     }
@@ -167,12 +168,7 @@ void BuddyHeap::myFree(MemoryBlock *block) {
         return;
     }
     block->setStatus(Status::FREE);
-    MemoryBlock *buddy = this->getBuddy(block);
-    while (buddy != nullptr && buddy->getStatus() == Status::FREE) {
-        if (buddy == block->getPrev()) {
-            block = buddy;
-        }
-        this->mergeWithNext(block);
-        buddy = this->getBuddy(block);
+    while (this->canMerge(block)) {
+        block = this->mergeWithBuddy(block);
     }
 }

@@ -1,14 +1,19 @@
 #pragma once
 #include "Heap.h"
 #include <string>
+#include <vector>
 
 class SegregatedHeap : Heap {
 private:
-    static const int MIN_CLASS = 16;
-    static const int MAX_CLASS_COUNT = 8;
+    // classes[i] is the slot size of zone i, zone_sizes[i] how many bytes the zone takes.
+    // Whatever is left after the class zones is the zone for large requests.
+    std::vector<int> classes;
+    std::vector<int> zone_sizes;
 
-    int classCount();
-    int zoneSize();
+    void parseConfig(std::string config);
+    void setDefaultConfig();
+    void createZones();
+    int classZonesSize();
     int zoneOf(int offset);
     int zoneFor(int size);
     int allocationSize(int size);
@@ -17,8 +22,8 @@ private:
     void splitInZone(MemoryBlock *block, int size);
     void mergeInZone(MemoryBlock *block);
 public:
-    SegregatedHeap(int size);
-    SegregatedHeap(int size, char *json);
+    SegregatedHeap(int size, std::string config = "");
+    SegregatedHeap(int size, char *json, std::string config = "");
     SegregatedHeap(const SegregatedHeap&) = delete;
     SegregatedHeap operator=(const SegregatedHeap&) = delete;
 
@@ -29,4 +34,5 @@ public:
 
     std::string serialize() override;
     std::string getType() override { return "SEGREGATED"; }
+    std::string getConfig() override;
 };

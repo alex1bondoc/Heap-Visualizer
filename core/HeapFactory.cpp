@@ -19,7 +19,7 @@ HeapType stringToHeapType(std::string type){
     return HeapType::FIRST_FIT;
 }
 
-Heap *HeapFactory::createHeap(std::string type, int size) {
+Heap *HeapFactory::createHeap(std::string type, int size, std::string config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
@@ -36,14 +36,14 @@ Heap *HeapFactory::createHeap(std::string type, int size) {
             return (Heap *)new BuddyHeap(size);
             break;
         case HeapType::SEGREGATED:
-            return (Heap *)new SegregatedHeap(size);
+            return (Heap *)new SegregatedHeap(size, config);
             break;
         default:
             return nullptr;
             break;
     }
 }
-Heap *HeapFactory::createHeap(std::string type, int size, char *json) {
+Heap *HeapFactory::createHeap(std::string type, int size, char *json, std::string config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
@@ -56,7 +56,7 @@ Heap *HeapFactory::createHeap(std::string type, int size, char *json) {
         case HeapType::BUDDY:
             return (Heap *)new BuddyHeap(size, json);
         case HeapType::SEGREGATED:
-            return (Heap *)new SegregatedHeap(size, json);
+            return (Heap *)new SegregatedHeap(size, json, config);
         default:
             return nullptr;
     }

@@ -1,19 +1,82 @@
 #include "SegregatedHeap.h"
 #include <sstream>
+#include <cstdlib>
 
-// Layout: about half of the heap holds one zone per size class
-// (16, 32, ... bytes, as many classes as fit), the rest is the zone for large requests.
-// Blocks never cross a zone boundary, so a zone can only be used by its own class.
-SegregatedHeap::SegregatedHeap(int size) : Heap(size) {
+SegregatedHeap::SegregatedHeap(int size, std::string config) : Heap(size) {
+    this->parseConfig(config);
+    this->createZones();
+};
+SegregatedHeap::SegregatedHeap(int size, char *json, std::string config) : Heap(size, json) {
+    this->parseConfig(config);
+};
+
+// Config format: "class:zoneSize,class:zoneSize,..." e.g. "16:128,32:128,64:128".
+// Classes must be increasing multiples of 8, every zone a multiple of its class,
+// and the zones must fit in the heap. Anything else falls back to the default.
+void SegregatedHeap::parseConfig(std::string config) {
+    this->classes.clear();
+    this->zone_sizes.clear();
+    std::stringstream ss(config);
+    std::string entry;
+    int total = 0;
+    bool valid = !config.empty();
+    while (valid && std::getline(ss, entry, ',')) {
+        size_t colon = entry.find(':');
+        if (colon == std::string::npos) {
+            valid = false;
+            break;
+        }
+        int size_class = std::atoi(entry.substr(0, colon).c_str());
+        int zone_size = std::atoi(entry.substr(colon + 1).c_str());
+        bool increasing = this->classes.empty() || size_class > this->classes.back();
+        if (size_class <= 0 || size_class % 8 != 0 || !increasing || zone_size < size_class || zone_size % size_class != 0) {
+            valid = false;
+            break;
+        }
+        total += zone_size;
+        this->classes.push_back(size_class);
+        this->zone_sizes.push_back(zone_size);
+    }
+    if (!valid || total > this->getSize()) {
+        this->setDefaultConfig();
+    }
+}
+
+// Default: classes 16, 32 and 64, each with an eighth of the heap.
+void SegregatedHeap::setDefaultConfig() {
+    this->classes.clear();
+    this->zone_sizes.clear();
+    for (int size_class : {16, 32, 64}) {
+        int zone_size = this->getSize() / 8 / size_class * size_class;
+        if (zone_size > 0) {
+            this->classes.push_back(size_class);
+            this->zone_sizes.push_back(zone_size);
+        }
+    }
+}
+
+std::string SegregatedHeap::getConfig() {
+    std::ostringstream ss;
+    for (size_t i = 0; i < this->classes.size(); ++i) {
+        if (i > 0) {
+            ss << ",";
+        }
+        ss << this->classes[i] << ":" << this->zone_sizes[i];
+    }
+    return ss.str();
+}
+
+// One free block per zone, so blocks never cross a zone boundary
+// and a zone can only be used by its own class.
+void SegregatedHeap::createZones() {
     delete this->head;
     this->head = nullptr;
     MemoryBlock *last = nullptr;
-    int count = this->classCount();
-    for (int zone = 0; zone <= count; ++zone) {
-        int zone_size = zone < count ? this->zoneSize() : size - count * this->zoneSize();
-        if (zone_size == 0) {
-            continue;
-        }
+    std::vector<int> sizes = this->zone_sizes;
+    if (this->getSize() > this->classZonesSize()) {
+        sizes.push_back(this->getSize() - this->classZonesSize());
+    }
+    for (int zone_size : sizes) {
         MemoryBlock *block = new MemoryBlock(zone_size, Status::FREE, nullptr, last);
         if (last == nullptr) {
             this->head = block;
@@ -23,58 +86,50 @@ SegregatedHeap::SegregatedHeap(int size) : Heap(size) {
         }
         last = block;
     }
-};
-SegregatedHeap::SegregatedHeap(int size, char *json) : Heap(size, json) {};
-
-// Largest number of classes whose biggest class still fits in its zone.
-int SegregatedHeap::classCount() {
-    int count = MAX_CLASS_COUNT;
-    while (count > 0 && (MIN_CLASS << (count - 1)) > this->getSize() / 2 / count) {
-        --count;
-    }
-    return count;
 }
 
-int SegregatedHeap::zoneSize() {
-    int count = this->classCount();
-    if (count == 0) {
-        return 0;
+int SegregatedHeap::classZonesSize() {
+    int total = 0;
+    for (int zone_size : this->zone_sizes) {
+        total += zone_size;
     }
-    int largest = MIN_CLASS << (count - 1);
-    return this->getSize() / 2 / count / largest * largest;
+    return total;
 }
 
+// Zones 0..classes.size()-1 are the class zones, classes.size() is the large zone.
 int SegregatedHeap::zoneOf(int offset) {
-    int count = this->classCount();
-    if (offset >= count * this->zoneSize()) {
-        return count;
-    }
-    return offset / this->zoneSize();
-}
-
-int SegregatedHeap::zoneFor(int size) {
-    int count = this->classCount();
-    for (int zone = 0; zone < count; ++zone) {
-        if (size <= (MIN_CLASS << zone)) {
+    int end = 0;
+    for (size_t zone = 0; zone < this->zone_sizes.size(); ++zone) {
+        end += this->zone_sizes[zone];
+        if (offset < end) {
             return zone;
         }
     }
-    return count;
+    return this->classes.size();
+}
+
+int SegregatedHeap::zoneFor(int size) {
+    for (size_t zone = 0; zone < this->classes.size(); ++zone) {
+        if (size <= this->classes[zone]) {
+            return zone;
+        }
+    }
+    return this->classes.size();
 }
 
 int SegregatedHeap::allocationSize(int size) {
     int zone = this->zoneFor(size);
-    if (zone == this->classCount()) {
+    if (zone == (int)this->classes.size()) {
         return (size + 7) & ~7;
     }
-    return MIN_CLASS << zone;
+    return this->classes[zone];
 }
 
 std::string SegregatedHeap::zoneLabel(int zone) {
-    if (zone == this->classCount()) {
+    if (zone == (int)this->classes.size()) {
         return "LARGE";
     }
-    return std::to_string(MIN_CLASS << zone);
+    return std::to_string(this->classes[zone]);
 }
 
 int SegregatedHeap::offsetOf(MemoryBlock *block) {

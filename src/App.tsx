@@ -6,12 +6,29 @@ import { useState, useEffect} from "react";
 import createHeapModule from "./heap.js";
 import {HeapCard} from "./Components/HeapCard";
 import type {HeapType} from "./Components/HeapCard";
-import {AddHeapForm} from "./Components/AddHeapForm";
+import {AddHeapForm, configSize} from "./Components/AddHeapForm";
 
 type HeapState = {
     type: HeapType;
+    config: string;
     blocks: MemoryBlock[];
 };
+
+// Older saves have no config, but every segregated block knows its zone,
+// so the "class:zoneSize" list can be rebuilt from consecutive zones.
+function configFromZones(blocks: any[]) {
+    const zones: {label: string, size: number}[] = [];
+    blocks.forEach((block: any) => {
+        const last = zones[zones.length - 1];
+        if (last !== undefined && last.label === block.zone) {
+            last.size += block.size;
+        }
+        else {
+            zones.push({label: block.zone, size: block.size});
+        }
+    });
+    return zones.filter((zone) => zone.label !== 'LARGE').map((zone) => `${zone.label}:${zone.size}`).join(',');
+}
 
 function App() {
     const [heapSize, setHeapSize] = useState<number>(() => {
@@ -48,7 +65,8 @@ function App() {
             const validHeaps = savedHeaps.filter((heap: any) =>
                 heap.blocks.reduce((total: number, block: any) => total + block.size, 0) === heapSize);
             validHeaps.forEach((heap: any) => {
-                wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string"], [heap.type, JSON.stringify(heap.blocks)]);
+                const config = heap.config ?? (heap.type === 'SEGREGATED' ? configFromZones(heap.blocks) : '');
+                wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string", "string"], [heap.type, config, JSON.stringify(heap.blocks)]);
             });
             if (savedHeaps.length === 0 || validHeaps.length > 0) {
                 return;
@@ -56,11 +74,11 @@ function App() {
         }
         const oldBlocks = localStorage.getItem("blocks");
         if (oldBlocks !== null) {
-            wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string"], ["BEST_FIT", oldBlocks]);
+            wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string", "string"], ["BEST_FIT", "", oldBlocks]);
             localStorage.removeItem("blocks");
             return;
         }
-        wasmInstance.ccall("wasmAddHeap", null, ["string"], ["BEST_FIT"]);
+        wasmInstance.ccall("wasmAddHeap", null, ["string", "string"], ["BEST_FIT", ""]);
     }
     const refreshHeaps = () => {
         if (wasmInstance === null) {
@@ -70,6 +88,7 @@ function App() {
         const json = JSON.parse(jsonString);
         setHeaps(json.map((heap: any) => ({
             type: heap.type as HeapType,
+            config: heap.config,
             blocks: heap.blocks.map((block: any) => new MemoryBlock(block.id, block.size, block.status as Status, block.zone)),
         })));
         localStorage.setItem("heaps", jsonString);
@@ -81,17 +100,19 @@ function App() {
         wasmInstance.ccall("wasmClearHeaps", null, [], []);
         wasmInstance.ccall("wasmSetHeapSize", null, ["number"], [size]);
         heaps.forEach((heap: HeapState) => {
-            wasmInstance.ccall("wasmAddHeap", null, ["string"], [heap.type]);
+            // A segregated layout that no longer fits falls back to the default one.
+            const config = configSize(heap.config) <= size ? heap.config : '';
+            wasmInstance.ccall("wasmAddHeap", null, ["string", "string"], [heap.type, config]);
         });
         setHeapSize(size);
         localStorage.setItem("heapSize", String(size));
         refreshHeaps();
     };
-    const addHeap = (type: HeapType) => {
+    const addHeap = (type: HeapType, config: string) => {
         if (wasmInstance === null) {
             return;
         }
-        wasmInstance.ccall("wasmAddHeap", null, ["string"], [type]);
+        wasmInstance.ccall("wasmAddHeap", null, ["string", "string"], [type, config]);
         refreshHeaps();
     };
     const deleteHeap = (index: number) => {
@@ -147,7 +168,7 @@ function App() {
                         erase={() => deleteHeap(index)}
                     />
                 ))}
-                <AddHeapForm addHeap={addHeap}></AddHeapForm>
+                <AddHeapForm heapSize={heapSize} addHeap={addHeap}></AddHeapForm>
             </div>
         </div>
     );

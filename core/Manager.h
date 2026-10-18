@@ -15,7 +15,7 @@ public:
     void setHeapSize(int heap_size) { this->heap_size = heap_size; }
     void setHeaps(std::vector<Heap *> heaps) { this->heaps = heaps; }
 
-    void addHeap(std::string type);
+    void addHeap(std::string type, std::string config = "");
     void deleteHeap(int index);
     void clearHeaps();
 

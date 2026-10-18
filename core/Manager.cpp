@@ -10,8 +10,8 @@ Manager::~Manager() {
     this->heaps.clear();
 }
 
-void Manager::addHeap(std::string type){
-    this->heaps.push_back(HeapFactory::createHeap(type, this->heap_size));
+void Manager::addHeap(std::string type, std::string config){
+    this->heaps.push_back(HeapFactory::createHeap(type, this->heap_size, config));
 }
 void Manager::deleteHeap(int index){
     auto it = this->heaps.begin();
@@ -31,7 +31,7 @@ std::string Manager::serialize() {
     ss << "[";
     int i{0};
     for (Heap* heap : this->heaps) {
-        ss << "{\"type\":\"" << heap->getType() << "\",\"blocks\":" << heap->serialize() << "}";
+        ss << "{\"type\":\"" << heap->getType() << "\",\"config\":\"" << heap->getConfig() << "\",\"blocks\":" << heap->serialize() << "}";
         if (i != heapCounter - 1) {
             ss << ",";
         }

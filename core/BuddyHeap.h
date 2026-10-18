@@ -6,10 +6,10 @@ class BuddyHeap : Heap {
 private:
     static const int MIN_BLOCK = 16;
 
-    int offsetOf(MemoryBlock *block);
-    MemoryBlock *getBuddy(MemoryBlock *block);
+    void createTopBlocks();
     void splitHalf(MemoryBlock *block);
-    void mergeWithNext(MemoryBlock *block);
+    bool canMerge(MemoryBlock *block);
+    MemoryBlock *mergeWithBuddy(MemoryBlock *block);
 public:
     BuddyHeap(int size);
     BuddyHeap(int size, char *json);

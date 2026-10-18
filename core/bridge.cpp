@@ -28,9 +28,9 @@ extern "C" {
     }
 
     EMSCRIPTEN_KEEPALIVE
-    const void wasmAddHeap(const char* type) {
+    const void wasmAddHeap(const char* type, const char* config) {
         wasmCreateManager();
-        manager->addHeap(std::string(type));
+        manager->addHeap(std::string(type), std::string(config));
     }
 
     EMSCRIPTEN_KEEPALIVE
@@ -80,9 +80,9 @@ extern "C" {
         manager->getHeaps()[index]->myRealloc(toBlock(address), size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmReconstructHeap(const char *type, char *json) {
+    const void wasmReconstructHeap(const char *type, const char *config, char *json) {
         wasmCreateManager();
-        Heap* reconstructed = HeapFactory::createHeap(std::string(type), heap_size, json);
+        Heap* reconstructed = HeapFactory::createHeap(std::string(type), heap_size, json, std::string(config));
         if (reconstructed != nullptr) {
             manager->getHeaps().push_back(reconstructed);
         }
@@ -94,8 +94,9 @@ extern "C" {
         }
         std::vector<Heap *>& heaps = manager->getHeaps();
         std::string type = heaps[index]->getType();
+        std::string config = heaps[index]->getConfig();
         delete heaps[index];
-        heaps[index] = HeapFactory::createHeap(type, heap_size);
+        heaps[index] = HeapFactory::createHeap(type, heap_size, config);
     }
 
 }

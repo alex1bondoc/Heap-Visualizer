@@ -27,4 +27,5 @@ public:
 
     virtual std::string serialize();
     virtual std::string getType() { return "HEAP"; }
+    virtual std::string getConfig() { return ""; }
 };
