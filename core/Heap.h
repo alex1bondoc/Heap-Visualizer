@@ -26,4 +26,5 @@ public:
     virtual void myFree(MemoryBlock *block);
 
     virtual std::string serialize();
+    virtual std::string getType() { return "HEAP"; }
 };

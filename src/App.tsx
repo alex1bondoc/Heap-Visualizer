@@ -1,16 +1,21 @@
-import Heap from "./Components/Heap";
 import Header from "./Components/Header";
 import { MemoryBlock } from "./Components/MemoryBlock";
 import type { Status } from "./Components/MemoryBlock";
-import { useContext, useState, useEffect} from "react";
+import { useState, useEffect} from "react";
 // @ts-ignore
 import createHeapModule from "./heap.js";
-import {MallocFunctionContext, FreeFunctionContext, ReallocFunctionContext, ResetFunctionContext} from "./Components/Contexts";
-import {ControlPanel} from "./Components/ControlPanel";
+import {HeapCard} from "./Components/HeapCard";
+import type {HeapType} from "./Components/HeapCard";
+import {AddHeapForm} from "./Components/AddHeapForm";
+
+type HeapState = {
+    type: HeapType;
+    blocks: MemoryBlock[];
+};
 
 function App() {
     const heapSize = 1024;
-    const [blocks, setBlocks] = useState<MemoryBlock[]>([]);
+    const [heaps, setHeaps] = useState<HeapState[]>([]);
     const [wasmInstance, setWasmInstance] = useState<any>(null);
 
     useEffect(() => {
@@ -24,70 +29,102 @@ function App() {
         if (wasmInstance === null) {
             return;
         }
-        getOldBlocks();
-        refreshBlocks();
+        getOldHeaps();
+        refreshHeaps();
     }, [wasmInstance]);
-    const getOldBlocks = () => {
+    const getOldHeaps = () => {
         if (wasmInstance === null) {
             return;
         }
-        const saved = localStorage.getItem("blocks");
+        wasmInstance.ccall("wasmClearHeaps", null, [], []);
+        const saved = localStorage.getItem("heaps");
         if (saved !== null) {
-            wasmInstance.ccall("wasmReconstructHeap", [], ["string"], [saved]);
+            JSON.parse(saved).forEach((heap: any) => {
+                wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string"], [heap.type, JSON.stringify(heap.blocks)]);
+            });
+            return;
         }
+        const oldBlocks = localStorage.getItem("blocks");
+        if (oldBlocks !== null) {
+            wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string"], ["BEST_FIT", oldBlocks]);
+            localStorage.removeItem("blocks");
+            return;
+        }
+        wasmInstance.ccall("wasmAddHeap", null, ["string"], ["BEST_FIT"]);
     }
-    const refreshBlocks = () => {
+    const refreshHeaps = () => {
         if (wasmInstance === null) {
             return;
         }
-        const serializedHeap = wasmInstance.ccall("wasmGetHeap", ["string"], [], []);
-        const jsonString = wasmInstance.UTF8ToString(serializedHeap);
+        const jsonString = wasmInstance.ccall("wasmGetHeaps", "string", [], []);
         const json = JSON.parse(jsonString);
-        setBlocks(json.map((block: any) => {return new MemoryBlock(block.id, block.size, block.status as Status);}));
-        localStorage.setItem("blocks", JSON.stringify(json));
+        setHeaps(json.map((heap: any) => ({
+            type: heap.type as HeapType,
+            blocks: heap.blocks.map((block: any) => new MemoryBlock(block.id, block.size, block.status as Status)),
+        })));
+        localStorage.setItem("heaps", jsonString);
     };
-    const malloc = (size: number) => {
-        if (wasmInstance === null) {
-        return;
-        }
-        wasmInstance.ccall("wasmMalloc", null, ["number"], [size]);
-        refreshBlocks();
-    };
-    const free = (address: string) => {
-        if (wasmInstance === null) {
-        return;
-        }
-        wasmInstance.ccall("wasmFree", null, ["string"], [address]);
-        refreshBlocks();
-    };
-    const realloc = (address: string, size: number) => {
+    const addHeap = (type: HeapType) => {
         if (wasmInstance === null) {
             return;
         }
-        wasmInstance.ccall("wasmRealloc", null, ["string", "number"], [address, size]);
-        refreshBlocks();
+        wasmInstance.ccall("wasmAddHeap", null, ["string"], [type]);
+        refreshHeaps();
     };
-    const reset = () => {
+    const deleteHeap = (index: number) => {
         if (wasmInstance === null) {
             return;
         }
-        wasmInstance.ccall("wasmResetHeap", null, [], []);
-        refreshBlocks();
+        wasmInstance.ccall("wasmDeleteHeap", null, ["number"], [index]);
+        refreshHeaps();
+    };
+    const malloc = (index: number, size: number) => {
+        if (wasmInstance === null) {
+        return;
+        }
+        wasmInstance.ccall("wasmMalloc", null, ["number", "number"], [index, size]);
+        refreshHeaps();
+    };
+    const free = (index: number, address: string) => {
+        if (wasmInstance === null) {
+        return;
+        }
+        wasmInstance.ccall("wasmFree", null, ["number", "string"], [index, address]);
+        refreshHeaps();
+    };
+    const realloc = (index: number, address: string, size: number) => {
+        if (wasmInstance === null) {
+            return;
+        }
+        wasmInstance.ccall("wasmRealloc", null, ["number", "string", "number"], [index, address, size]);
+        refreshHeaps();
+    };
+    const reset = (index: number) => {
+        if (wasmInstance === null) {
+            return;
+        }
+        wasmInstance.ccall("wasmResetHeap", null, ["number"], [index]);
+        refreshHeaps();
     }
     return (
-        <div className="flex flex-col h-screen w-full bg-slate-900 center ">
+        <div className="flex flex-col h-screen w-full bg-slate-900">
             <Header size={heapSize}></Header>
-            <div className="border-4 w-full h-1/3 border-slate-100 rounded-xl">
-                <ReallocFunctionContext value={realloc}>
-                    <FreeFunctionContext value={free}>
-                        <Heap size={heapSize} blocks={blocks}></Heap>
-                    </FreeFunctionContext>
-                </ReallocFunctionContext>
-                <ResetFunctionContext value={reset}>
-                    <MallocFunctionContext value={malloc}>
-                        <ControlPanel></ControlPanel>
-                    </MallocFunctionContext>
-                </ResetFunctionContext>
+            <div className="flex flex-col w-full flex-1 overflow-y-auto p-4 gap-4">
+                {heaps.map((heap: HeapState, index: number) => (
+                    <HeapCard
+                        key={index}
+                        index={index}
+                        type={heap.type}
+                        size={heapSize}
+                        blocks={heap.blocks}
+                        malloc={(size: number) => malloc(index, size)}
+                        free={(address: string) => free(index, address)}
+                        realloc={(address: string, size: number) => realloc(index, address, size)}
+                        reset={() => reset(index)}
+                        erase={() => deleteHeap(index)}
+                    />
+                ))}
+                <AddHeapForm addHeap={addHeap}></AddHeapForm>
             </div>
         </div>
     );

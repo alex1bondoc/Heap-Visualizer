@@ -31,6 +31,20 @@ Heap *HeapFactory::createHeap(std::string type, int size) {
             break;
     }
 }
+Heap *HeapFactory::createHeap(std::string type, int size, char *json) {
+    HeapType t = stringToHeapType(type);
+
+    switch (t) {
+        case HeapType::FIRST_FIT:
+            return (Heap *)new FirstFitHeap(size, json);
+        case HeapType::NEXT_FIT:
+            return (Heap *)new NextFitHeap(size, json);
+        case HeapType::BEST_FIT:
+            return (Heap *)new BestFitHeap(size, json);
+        default:
+            return nullptr;
+    }
+}
 BestFitHeap *HeapFactory::createBestFitHeap(int size) {
     return new BestFitHeap(size);
 }

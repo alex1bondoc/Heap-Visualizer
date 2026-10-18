@@ -17,6 +17,7 @@ public:
 
     void addHeap(std::string type);
     void deleteHeap(int index);
+    void clearHeaps();
 
     std::string serialize();
 };

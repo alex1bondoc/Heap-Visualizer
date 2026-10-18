@@ -14,14 +14,10 @@ export function ControlPanel() {
             setSize(Number(value));
     }
     return (
-        <div className="w-full h-30 justify-center items-center flex">
-            <div className="flex flex-col w-70 h-30 items-center justify-center bg-slate-800 border-4 boder-slate-900 rounded-3xl shadow-xl p-6 gap-5 font-sans">
-                <div className="flex flex-row w-full h-full items-center justify-center gap-1">
-                    <input placeholder="Bytes..." onChange={handleChange} value={size} className="font-mono px-4 h-12 w-32 transition-all bg-slate-700 border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-xl text-right"></input>
-                    <button className="border-2 bg-blue-400 h-12 w-20 rounded-xl " onClick={() => malloc(size)}>Malloc</button>
-                </div>
-                <button className="border-2 bg-red-400 h-12 w-50 rounded-xl " onClick={() => reset()}>Reset-Heap</button>
-            </div>
+        <div className="flex flex-row w-full items-center justify-center gap-2">
+            <input placeholder="Bytes..." onChange={handleChange} value={size} className="font-mono px-3 h-9 w-28 transition-all bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-lg text-right"></input>
+            <button className="bg-blue-400 hover:bg-blue-600 h-9 px-4 rounded-lg transition-colors" onClick={() => malloc(size)}>Malloc</button>
+            <button className="bg-red-400 hover:bg-red-600 h-9 px-4 rounded-lg transition-colors" onClick={() => reset()}>Reset Heap</button>
         </div>
     );
 }

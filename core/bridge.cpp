@@ -9,6 +9,15 @@
 int heap_size = 1024;
 Manager* manager = nullptr;
 
+bool validIndex(const int index) {
+    return manager != nullptr && index >= 0 && index < (int)manager->getHeaps().size();
+}
+
+MemoryBlock *toBlock(const char *address) {
+    unsigned long adressNumerical = std::stoul(address, nullptr, 16);
+    return reinterpret_cast<MemoryBlock *>(adressNumerical);
+}
+
 extern "C" {
     
     EMSCRIPTEN_KEEPALIVE
@@ -20,81 +29,67 @@ extern "C" {
 
     EMSCRIPTEN_KEEPALIVE
     const void wasmAddHeap(const char* type) {
+        wasmCreateManager();
         manager->addHeap(std::string(type));
     }
 
     EMSCRIPTEN_KEEPALIVE
     const void wasmDeleteHeap(const int index) {
-        if ((index >= 0 && index < manager->getHeaps().size())){
-            return ;
+        if (!validIndex(index)) {
+            return;
         }
         manager->deleteHeap(index);
     }
     EMSCRIPTEN_KEEPALIVE
+    const void wasmClearHeaps() {
+        wasmCreateManager();
+        manager->clearHeaps();
+    }
+    EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeaps() {
         wasmCreateManager();
-        std::cout << manager->serialize() << std::endl;
-        static std::string json = manager->serialize();
-        return json.c_str();
-    }
-    EMSCRIPTEN_KEEPALIVE
-    const char* wasmGetHeap() {
-        wasmCreateManager();
-        if (manager->getHeaps().empty()) {
-            wasmAddHeap("BEST_FIT");
-        }
         static std::string json;
-        json = manager->getHeaps()[0]->serialize();
-        std::cout << json << std::endl;
+        json = manager->serialize();
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmMalloc(const int size) {
-        manager->getHeaps()[0]->myMalloc(size);
-    }
-    EMSCRIPTEN_KEEPALIVE
-    const void wasmFree(const char *address) {
-        if (address == nullptr) {
+    const void wasmMalloc(const int index, const int size) {
+        if (!validIndex(index)) {
             return;
         }
-        unsigned long adressNumerical = std::stoul(address, nullptr, 16);
-        void *ptr = reinterpret_cast<void *>(adressNumerical);
-        manager->getHeaps()[0]->myFree((MemoryBlock *)ptr);
+        manager->getHeaps()[index]->myMalloc(size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmRealloc(const char *address, const int size) {
-        if (address == nullptr) {
-            
+    const void wasmFree(const int index, const char *address) {
+        if (!validIndex(index) || address == nullptr) {
             return;
         }
-        unsigned long adressNumerical = std::stoul(address, nullptr, 16);
-        void *ptr = reinterpret_cast<void *>(adressNumerical);
-        manager->getHeaps()[0]->myRealloc((MemoryBlock *)ptr, size);
+        manager->getHeaps()[index]->myFree(toBlock(address));
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmReconstructHeap(char *json) {
+    const void wasmRealloc(const int index, const char *address, const int size) {
+        if (!validIndex(index) || address == nullptr) {
+            return;
+        }
+        manager->getHeaps()[index]->myRealloc(toBlock(address), size);
+    }
+    EMSCRIPTEN_KEEPALIVE
+    const void wasmReconstructHeap(const char *type, char *json) {
         wasmCreateManager();
-        std::vector<Heap *>& heaps = manager->getHeaps();
-        Heap* reconstructed = (Heap*)(new BestFitHeap(heap_size, json));
-        if (heaps.empty()) {
-            heaps.push_back(reconstructed);
+        Heap* reconstructed = HeapFactory::createHeap(std::string(type), heap_size, json);
+        if (reconstructed != nullptr) {
+            manager->getHeaps().push_back(reconstructed);
         }
-        else {
-            delete heaps[0];
-            heaps[0] = reconstructed;
-        }
-        std::cout << manager->serialize() << std::endl;
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmResetHeap() {
-        wasmCreateManager();
-        std::vector<Heap *>& heaps = manager->getHeaps();
-        if (heaps.empty()) {
-            wasmAddHeap("BEST_FIT");
+    const void wasmResetHeap(const int index) {
+        if (!validIndex(index)) {
             return;
         }
-        delete heaps[0];
-        heaps[0] = HeapFactory::createHeap("BEST_FIT", heap_size);
+        std::vector<Heap *>& heaps = manager->getHeaps();
+        std::string type = heaps[index]->getType();
+        delete heaps[index];
+        heaps[index] = HeapFactory::createHeap(type, heap_size);
     }
 
 }

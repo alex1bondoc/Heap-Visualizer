@@ -16,21 +16,28 @@ void Manager::addHeap(std::string type){
 void Manager::deleteHeap(int index){
     auto it = this->heaps.begin();
     advance(it, index);
+    delete *it;
     this->heaps.erase(it);
+}
+void Manager::clearHeaps() {
+    for (const Heap* heap : this->heaps) {
+        delete heap;
+    }
+    this->heaps.clear();
 }
 std::string Manager::serialize() {
     std::ostringstream ss;
     int heapCounter = this->heaps.size();
-    ss << "{ " << "\"NumberOfHeaps\": " << heapCounter << ", \"heaps\": [ ";
+    ss << "[";
     int i{0};
     for (Heap* heap : this->heaps) {
-        ss << heap->serialize();
+        ss << "{\"type\":\"" << heap->getType() << "\",\"blocks\":" << heap->serialize() << "}";
         if (i != heapCounter - 1) {
             ss << ",";
         }
         i += 1;
     }
-    ss << "] }";
+    ss << "]";
 
     return ss.str();
 

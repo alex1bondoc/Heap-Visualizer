@@ -12,6 +12,7 @@ enum class HeapType : int {
 class HeapFactory {
 public:
     static Heap *createHeap(std::string type, int size);
+    static Heap *createHeap(std::string type, int size, char *json);
 private:
     static BestFitHeap *createBestFitHeap(int size);
     static FirstFitHeap *createFirstFitHeap(int size);

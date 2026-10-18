@@ -16,4 +16,5 @@ public:
     void myFree(MemoryBlock *block) override;
 
     std::string serialize() override;
+    std::string getType() override { return "FIRST_FIT"; }
 };
