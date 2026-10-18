@@ -41,6 +41,12 @@ extern "C" {
         manager->deleteHeap(index);
     }
     EMSCRIPTEN_KEEPALIVE
+    const void wasmSetHeapSize(const int size) {
+        wasmCreateManager();
+        heap_size = size;
+        manager->setHeapSize(size);
+    }
+    EMSCRIPTEN_KEEPALIVE
     const void wasmClearHeaps() {
         wasmCreateManager();
         manager->clearHeaps();

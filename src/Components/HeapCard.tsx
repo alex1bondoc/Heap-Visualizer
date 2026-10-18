@@ -3,12 +3,14 @@ import {MemoryBlock} from "./MemoryBlock";
 import {ControlPanel} from "./ControlPanel";
 import {MallocFunctionContext, FreeFunctionContext, ReallocFunctionContext, ResetFunctionContext} from "./Contexts";
 
-export type HeapType = 'BEST_FIT' | 'FIRST_FIT' | 'NEXT_FIT';
+export type HeapType = 'BEST_FIT' | 'FIRST_FIT' | 'NEXT_FIT' | 'BUDDY' | 'SEGREGATED';
 
 export const heapTypeLabels: Record<HeapType, string> = {
     BEST_FIT: 'Best Fit',
     FIRST_FIT: 'First Fit',
     NEXT_FIT: 'Next Fit',
+    BUDDY: 'Buddy',
+    SEGREGATED: 'Segregated Lists',
 };
 
 export function HeapCard({index, type, size, blocks, malloc, free, realloc, reset, erase}: {
@@ -35,7 +37,7 @@ export function HeapCard({index, type, size, blocks, malloc, free, realloc, rese
             </ReallocFunctionContext>
             <ResetFunctionContext value={reset}>
                 <MallocFunctionContext value={malloc}>
-                    <ControlPanel></ControlPanel>
+                    <ControlPanel maxSize={size}></ControlPanel>
                 </MallocFunctionContext>
             </ResetFunctionContext>
         </div>

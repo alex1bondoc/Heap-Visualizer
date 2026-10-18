@@ -4502,6 +4502,7 @@ function checkIncomingModuleAPI() {
 var _wasmCreateManager = Module['_wasmCreateManager'] = makeInvalidEarlyAccess('_wasmCreateManager');
 var _wasmAddHeap = Module['_wasmAddHeap'] = makeInvalidEarlyAccess('_wasmAddHeap');
 var _wasmDeleteHeap = Module['_wasmDeleteHeap'] = makeInvalidEarlyAccess('_wasmDeleteHeap');
+var _wasmSetHeapSize = Module['_wasmSetHeapSize'] = makeInvalidEarlyAccess('_wasmSetHeapSize');
 var _wasmClearHeaps = Module['_wasmClearHeaps'] = makeInvalidEarlyAccess('_wasmClearHeaps');
 var _wasmGetHeaps = Module['_wasmGetHeaps'] = makeInvalidEarlyAccess('_wasmGetHeaps');
 var _wasmMalloc = Module['_wasmMalloc'] = makeInvalidEarlyAccess('_wasmMalloc');
@@ -4527,6 +4528,7 @@ function assignWasmExports(wasmExports) {
   assert(typeof wasmExports['wasmCreateManager'] != 'undefined', 'missing Wasm export: wasmCreateManager');
   assert(typeof wasmExports['wasmAddHeap'] != 'undefined', 'missing Wasm export: wasmAddHeap');
   assert(typeof wasmExports['wasmDeleteHeap'] != 'undefined', 'missing Wasm export: wasmDeleteHeap');
+  assert(typeof wasmExports['wasmSetHeapSize'] != 'undefined', 'missing Wasm export: wasmSetHeapSize');
   assert(typeof wasmExports['wasmClearHeaps'] != 'undefined', 'missing Wasm export: wasmClearHeaps');
   assert(typeof wasmExports['wasmGetHeaps'] != 'undefined', 'missing Wasm export: wasmGetHeaps');
   assert(typeof wasmExports['wasmMalloc'] != 'undefined', 'missing Wasm export: wasmMalloc');
@@ -4549,6 +4551,7 @@ function assignWasmExports(wasmExports) {
   _wasmCreateManager = Module['_wasmCreateManager'] = createExportWrapper('wasmCreateManager', wasmExports['wasmCreateManager'], 0);
   _wasmAddHeap = Module['_wasmAddHeap'] = createExportWrapper('wasmAddHeap', wasmExports['wasmAddHeap'], 1);
   _wasmDeleteHeap = Module['_wasmDeleteHeap'] = createExportWrapper('wasmDeleteHeap', wasmExports['wasmDeleteHeap'], 1);
+  _wasmSetHeapSize = Module['_wasmSetHeapSize'] = createExportWrapper('wasmSetHeapSize', wasmExports['wasmSetHeapSize'], 1);
   _wasmClearHeaps = Module['_wasmClearHeaps'] = createExportWrapper('wasmClearHeaps', wasmExports['wasmClearHeaps'], 0);
   _wasmGetHeaps = Module['_wasmGetHeaps'] = createExportWrapper('wasmGetHeaps', wasmExports['wasmGetHeaps'], 0);
   _wasmMalloc = Module['_wasmMalloc'] = createExportWrapper('wasmMalloc', wasmExports['wasmMalloc'], 2);

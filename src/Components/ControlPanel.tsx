@@ -1,14 +1,14 @@
 import {useContext, useState} from 'react';
 import {MallocFunctionContext, ResetFunctionContext} from "./Contexts";
 
-export function ControlPanel() {
+export function ControlPanel({maxSize}: {maxSize: number}) {
     const [size, setSize] = useState(0)
     const malloc = useContext(MallocFunctionContext);
     const reset = useContext(ResetFunctionContext);
     const handleChange = (event: any) => {
         const value = event.target.value.replace(/\D/g, '');
-        if (Number(value) > 1024) {
-            setSize(1024);
+        if (Number(value) > maxSize) {
+            setSize(maxSize);
         }
         else 
             setSize(Number(value));

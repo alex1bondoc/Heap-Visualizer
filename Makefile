@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 compile-test:
-	g++ core/main.cpp core/MemoryBlock.cpp core/Heap.cpp core/BestFitHeap.cpp core/HeapFactory.cpp core/FirstFitHeap.cpp core/NextFitHeap.cpp core/Manager.cpp -o core/main 
+	g++ core/main.cpp core/MemoryBlock.cpp core/Heap.cpp core/BestFitHeap.cpp core/HeapFactory.cpp core/FirstFitHeap.cpp core/NextFitHeap.cpp core/Manager.cpp core/BuddyHeap.cpp core/SegregatedHeap.cpp -o core/main 
 run-test:
 	core/main
 memory-test:
@@ -8,7 +8,7 @@ memory-test:
 clean-test:
 	rm -f core/main
 compile-wasm:
-	. ~/.emsdk/emsdk_env.sh > /dev/null && em++ core/bridge.cpp  core/MemoryBlock.cpp core/Heap.cpp core/BestFitHeap.cpp core/HeapFactory.cpp core/FirstFitHeap.cpp core/NextFitHeap.cpp core/Manager.cpp\
+	. ~/.emsdk/emsdk_env.sh > /dev/null && em++ core/bridge.cpp  core/MemoryBlock.cpp core/Heap.cpp core/BestFitHeap.cpp core/HeapFactory.cpp core/FirstFitHeap.cpp core/NextFitHeap.cpp core/Manager.cpp core/BuddyHeap.cpp core/SegregatedHeap.cpp\
                                     -o src/heap.js  \
                                     -s WASM=1 \
                                     -s EXPORT_ES6=1 \

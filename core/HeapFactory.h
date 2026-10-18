@@ -2,11 +2,15 @@
 #include "BestFitHeap.h"
 #include "FirstFitHeap.h"
 #include "NextFitHeap.h"
+#include "BuddyHeap.h"
+#include "SegregatedHeap.h"
 
 enum class HeapType : int {
     FIRST_FIT = 0,
     NEXT_FIT,
     BEST_FIT, 
+    BUDDY,
+    SEGREGATED,
 };
 
 class HeapFactory {

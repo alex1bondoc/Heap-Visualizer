@@ -1,14 +1,14 @@
 import {MemoryBlock} from "./MemoryBlock";
 import {useState, useContext} from 'react';
 import {FreeFunctionContext, ReallocFunctionContext} from "./Contexts";
-export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
+export function SelectedBlockPanel({block, maxSize, onHover, onExit}:{block: MemoryBlock, maxSize: number, onHover:(e: React.MouseEvent<HTMLDivElement>, block: MemoryBlock) => void, onExit:() => void}) { 
     const free = useContext(FreeFunctionContext);
     const realloc = useContext(ReallocFunctionContext);
     const [size, setSize] = useState<number>(0);
     const handleChange = (event: any) => {
         const value = event.target.value.replace(/\D/g, '');
-        if (Number(value) > 1024) {
-            setSize(1024);
+        if (Number(value) > maxSize) {
+            setSize(maxSize);
         }
         else 
             setSize(value);
@@ -20,6 +20,7 @@ export function SelectedBlockPanel({block, onHover, onExit}:{block: MemoryBlock,
                 bg-red-500 hover:bg-red-700 rounded-full font-bold transition-colors"><></></button>
             <p className={`mx-auto ${block.status === 'FREE' ? 'text-emerald-500' : 'text-red-500' }`}>STATUS: {block.status}</p>
             <p className="mx-auto text-slate-100">Size: {block.size} bytes</p>
+            {block.zone !== undefined && <p className="mx-auto text-slate-400">Zone: {block.zone === 'LARGE' ? 'large allocations' : `${block.zone} B class`}</p>}
             { block.status === 'ALLOC' ?
                 <button onClick={() => {free(block.id), onExit()}} className="bg-blue-400 mx-auto w-40 h-7 rounded-full">Free Block</button>
             : <></>}

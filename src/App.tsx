@@ -14,7 +14,10 @@ type HeapState = {
 };
 
 function App() {
-    const heapSize = 1024;
+    const [heapSize, setHeapSize] = useState<number>(() => {
+        const saved = Number(localStorage.getItem("heapSize"));
+        return saved > 0 ? saved : 1024;
+    });
     const [heaps, setHeaps] = useState<HeapState[]>([]);
     const [wasmInstance, setWasmInstance] = useState<any>(null);
 
@@ -37,12 +40,19 @@ function App() {
             return;
         }
         wasmInstance.ccall("wasmClearHeaps", null, [], []);
+        wasmInstance.ccall("wasmSetHeapSize", null, ["number"], [heapSize]);
         const saved = localStorage.getItem("heaps");
         if (saved !== null) {
-            JSON.parse(saved).forEach((heap: any) => {
+            const savedHeaps = JSON.parse(saved);
+            // Heaps saved with a different heap size cannot be rebuilt.
+            const validHeaps = savedHeaps.filter((heap: any) =>
+                heap.blocks.reduce((total: number, block: any) => total + block.size, 0) === heapSize);
+            validHeaps.forEach((heap: any) => {
                 wasmInstance.ccall("wasmReconstructHeap", null, ["string", "string"], [heap.type, JSON.stringify(heap.blocks)]);
             });
-            return;
+            if (savedHeaps.length === 0 || validHeaps.length > 0) {
+                return;
+            }
         }
         const oldBlocks = localStorage.getItem("blocks");
         if (oldBlocks !== null) {
@@ -60,9 +70,22 @@ function App() {
         const json = JSON.parse(jsonString);
         setHeaps(json.map((heap: any) => ({
             type: heap.type as HeapType,
-            blocks: heap.blocks.map((block: any) => new MemoryBlock(block.id, block.size, block.status as Status)),
+            blocks: heap.blocks.map((block: any) => new MemoryBlock(block.id, block.size, block.status as Status, block.zone)),
         })));
         localStorage.setItem("heaps", jsonString);
+    };
+    const resizeHeaps = (size: number) => {
+        if (wasmInstance === null || size === heapSize) {
+            return;
+        }
+        wasmInstance.ccall("wasmClearHeaps", null, [], []);
+        wasmInstance.ccall("wasmSetHeapSize", null, ["number"], [size]);
+        heaps.forEach((heap: HeapState) => {
+            wasmInstance.ccall("wasmAddHeap", null, ["string"], [heap.type]);
+        });
+        setHeapSize(size);
+        localStorage.setItem("heapSize", String(size));
+        refreshHeaps();
     };
     const addHeap = (type: HeapType) => {
         if (wasmInstance === null) {
@@ -108,8 +131,8 @@ function App() {
     }
     return (
         <div className="flex flex-col h-screen w-full bg-slate-900">
-            <Header size={heapSize}></Header>
-            <div className="flex flex-col w-full flex-1 overflow-y-auto p-4 gap-4">
+            <Header size={heapSize} resize={resizeHeaps}></Header>
+            <div className="flex flex-col w-full flex-1 overflow-y-auto p-4 gap-1">
                 {heaps.map((heap: HeapState, index: number) => (
                     <HeapCard
                         key={index}
