@@ -78,10 +78,8 @@ MemoryBlock *FirstFitHeap::myRealloc(MemoryBlock *block, int size) {
             return block;
         }
         else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
-            if (block->getSize() + prev->getSize() == size) {
-                FirstFitHeap::setHead(block);
-            }
             block->joinPrev(size - block->getSize());
+            if (!block->getPrev()) this->setHead(block);
             return block;
         }
         else if(prev != nullptr && next != nullptr && prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() >= size) {

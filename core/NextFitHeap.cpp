@@ -1,4 +1,5 @@
 #include "NextFitHeap.h"
+#include "Heap.h"
 #include "sstream"
 #include <iostream>
 
@@ -108,11 +109,9 @@ MemoryBlock *NextFitHeap::myRealloc(MemoryBlock *block, int size) {
             return block;
         }
         else if(prev != nullptr && prev->getStatus() == Status::FREE && block->getSize() + prev->getSize() >= size) {
-            if (block->getSize() + prev->getSize() == size) {
-                NextFitHeap::setHead(block);
-            }
             block->joinPrev(size - block->getSize());
             last_allocated = block;
+            if (!block->getPrev()) this->setHead(block);
             return block;
         }
         else if(prev != nullptr && next != nullptr && prev->getStatus() == Status::FREE && next->getStatus() == Status::FREE && block->getSize() + next->getSize() + prev->getSize() >= size) {
@@ -144,18 +143,15 @@ MemoryBlock *NextFitHeap::myRealloc(MemoryBlock *block, int size) {
 }
 
 void NextFitHeap::myFree(MemoryBlock *block) {
-    if (block == nullptr || block->getStatus() == Status::FREE) {
+    if (!block || block->getStatus() == Status::FREE) {
         return;
     }
     block->setStatus(Status::FREE);
-    if (block == last_allocated) {
-        last_allocated = block->getPrev();
-    }
+    bool merged = last_allocated == block || last_allocated == block->getNext() || last_allocated == block->getPrev();
     block->mergeNext();
     block->mergePrev();
-    if (block->getPrev() == nullptr) {
-        NextFitHeap::setHead(block);
-    }
+    if (merged) last_allocated = block;
+    if (!block->getPrev()) this->setHead(block);
 }
 
 std::string NextFitHeap::serialize() {

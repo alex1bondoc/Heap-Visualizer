@@ -1,243 +1,302 @@
-# Heap Visualizer
+<div align="center">
 
-An interactive visualizer for a **dynamic memory allocator** written in C++ and running directly in the browser through **WebAssembly**. The heap is simulated as a doubly linked list of memory blocks, and the UI (React + Tailwind) draws in real time how memory gets split, allocated and released as you call `malloc`, `realloc` and `free`.
+# 🧠 Heap Visualizer
 
-The project is educational: it lets you see **fragmentation** happen, watch free blocks get **split** and **coalesced**, and understand how the **First Fit**, **Next Fit** and **Best Fit** allocation strategies differ.
+**Five memory allocators written in C++, compiled to WebAssembly and visualized live in the browser.**
 
-![Heap Visualizer demo: allocating blocks, freeing two of them, then a small malloc and a realloc that grows in place](docs/demo.gif)
+Watch `malloc`, `realloc` and `free` split, coalesce and fragment memory — and compare
+First Fit, Next Fit, Best Fit, Buddy and Segregated Lists side by side.
+
+[![Live demo](https://img.shields.io/badge/▶_Live_demo-GitHub_Pages-2ea44f?style=for-the-badge)](https://alex1bondoc.github.io/Heap-Visualizer/)
+
+![C++](https://img.shields.io/badge/C++-00599C?style=flat-square&logo=cplusplus&logoColor=white)
+![WebAssembly](https://img.shields.io/badge/WebAssembly-654FF0?style=flat-square&logo=webassembly&logoColor=white)
+![Emscripten](https://img.shields.io/badge/Emscripten-333333?style=flat-square)
+![React 19](https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_4-0F172A?style=flat-square&logo=tailwindcss&logoColor=38BDF8)
+![Vite](https://img.shields.io/badge/Vite_7-646CFF?style=flat-square&logo=vite&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
+
+![Heap Visualizer demo](docs/demo.gif)
+
+</div>
 
 ---
 
-## Contents
+## ✨ Why this project
 
-- [Features](#features)
-- [Architecture](#architecture)
-- [Project structure](#project-structure)
-- [How the allocator works](#how-the-allocator-works)
-- [C++ ↔ JavaScript bridge](#c--javascript-bridge)
-- [User interface](#user-interface)
-- [Getting started](#getting-started)
-- [Makefile targets](#makefile-targets)
-- [Current status and roadmap](#current-status-and-roadmap)
+Memory allocators are usually invisible: you call `malloc`, you get a pointer. This project opens the box. Every heap is drawn as a bar of blocks, and every operation is executed by a **real allocator implementation in C++** — the browser only renders what the allocator reports.
+
+**What it shows off**
+
+| Area | What's inside |
+|---|---|
+| **Systems programming** | Five allocation strategies over a hand-managed doubly linked list: block splitting, coalescing, in-place `realloc`, power-of-two buddy trees, size-class zones. |
+| **C++ design** | Polymorphic `Heap` hierarchy, `HeapFactory` (factory pattern), a `Manager` that owns many heaps, explicit ownership and cleanup of every block. |
+| **C++ ↔ JS interop** | A small C ABI exported from WebAssembly with Emscripten, called from React through `ccall`, with state exchanged as JSON. |
+| **Frontend** | React 19 + TypeScript, Context to avoid prop drilling, live re-rendering, form validation, state persisted across refreshes. |
+| **Tooling** | Makefile for native, Valgrind and WASM builds; type-checked production build; automatic deploy to GitHub Pages with GitHub Actions. |
 
 ---
 
-## Features
+## 🚀 Features
 
-- A simulated **1024-byte** heap, drawn as a horizontal bar where each block's width is proportional to its size.
-- Blocks are color-coded by state: **green = FREE**, **red = ALLOC**.
-- **Malloc** from the control panel (any size from 0 to 1024 bytes).
-- Clicking a block opens a panel with its details (status, size) and, for allocated blocks, **Free** and **Realloc** actions.
-- **Reset Heap** brings the heap back to a single 1024-byte free block.
-- All sizes are **8-byte aligned**, like in a real allocator.
-- Three allocation strategies implemented in C++: First Fit, Next Fit and Best Fit.
+- 🧩 **Multiple heaps at once** — add as many as you want, each with its own strategy, and compare how they react to the same requests.
+- ⚙️ **Five strategies** — First Fit, Next Fit, Best Fit, **Buddy** and **Segregated Lists**.
+- 📏 **Configurable heap size** — 64 B to 1 MiB; changing it resets every heap and keeps their types.
+- 🗂️ **Configurable segregated heaps** — choose the size classes and how much memory each class gets.
+- 🎨 **Live, to-scale view** — block width ∝ block size, 🟩 free / 🟥 allocated, zone boundaries for segregated heaps.
+- 🖱️ **Block inspector** — click any block to see it, then **Free** or **Realloc** it.
+- 💾 **Persistence** — heaps, contents and settings survive a page refresh.
 
-## Architecture
+---
 
-```
-┌──────────────────────────┐        ccall()         ┌──────────────────────────┐
-│   React + TypeScript     │ ─────────────────────▶ │   C++ compiled to WASM   │
-│   (src/)                 │                        │   (core/ → heap.wasm)    │
-│                          │ ◀───────────────────── │                          │
-│  renders the blocks      │   JSON list of blocks  │  Manager → Heap → Blocks │
-└──────────────────────────┘                        └──────────────────────────┘
-```
+## 🏗️ Architecture
 
-All allocation logic lives in C++. The frontend does no memory bookkeeping of its own: it sends commands (`malloc`, `free`, `realloc`, `reset`), then asks for the heap's state serialized as JSON and re-renders it.
-
-## Project structure
-
-```
-Heap-Visualizer/
-├── core/                    # Allocator logic (C++)
-│   ├── MemoryBlock.h/.cpp   # A single memory block: size, status, next, prev
-│   ├── Heap.h/.cpp          # Base class: the block list and JSON serialization
-│   ├── FirstFitHeap.h/.cpp  # First Fit strategy
-│   ├── NextFitHeap.h/.cpp   # Next Fit strategy
-│   ├── BestFitHeap.h/.cpp   # Best Fit strategy
-│   ├── HeapFactory.h/.cpp   # Builds the right heap from a string ("BEST_FIT", etc.)
-│   ├── Manager.h/.cpp       # Holds a collection of heaps and serializes them
-│   ├── bridge.cpp           # Functions exported to JavaScript (wasm*)
-│   └── main.cpp             # Native test program (no browser needed)
-│
-├── src/                     # Frontend (React 19 + TypeScript + Tailwind 4)
-│   ├── App.tsx              # Loads the WASM module, holds state, wires malloc/free/realloc
-│   ├── heap.js              # Emscripten-generated glue code (do not edit by hand)
-│   ├── main.tsx             # React entry point
-│   ├── index.css            # Tailwind import
-│   └── Components/
-│       ├── Header.tsx             # Top bar with the title and heap size
-│       ├── Heap.tsx               # The block bar + the selected-block panel
-│       ├── MemoryBlock.tsx        # TS model of a block (id, size, status)
-│       ├── MemoryBlockUI.tsx      # Renders one block, width proportional to its size
-│       ├── SelectedBlockPanel.tsx # Block details + Free / Realloc
-│       ├── ControlPanel.tsx       # Malloc input + Reset Heap
-│       └── Contexts.tsx           # React Contexts for malloc/free/realloc/reset
-│
-├── public/
-│   └── heap.wasm            # WebAssembly binary compiled from core/
-│
-├── Makefile                 # Native build, Valgrind run and WASM build
-├── package.json             # Dependencies and Vite scripts
-├── vite.config.ts
-└── index.html
+```mermaid
+flowchart LR
+    subgraph Browser
+        UI["React + TypeScript<br/>(src/)"]
+    end
+    subgraph WASM["C++ compiled to WebAssembly (core/)"]
+        B["bridge.cpp<br/>exported C functions"]
+        M["Manager"]
+        F["HeapFactory"]
+        H["Heap (base class)"]
+        FF["FirstFit"]
+        NF["NextFit"]
+        BF["BestFit"]
+        BU["Buddy"]
+        SG["Segregated"]
+    end
+    UI -- "ccall('wasmMalloc', index, size)" --> B
+    B --> M
+    M -- creates via --> F
+    F --> H
+    H --> FF & NF & BF & BU & SG
+    B -- "JSON of every heap" --> UI
 ```
 
-## How the allocator works
+All allocation logic lives in C++; the frontend never keeps its own copy of the heap. Every user action follows the same path:
 
-### Memory blocks
+```
+WASM call → wasmGetHeaps() → JSON.parse → setHeaps → re-render → save to localStorage
+```
 
-The heap is a **doubly linked list** of `MemoryBlock` objects. Each block stores:
+---
 
-| Field    | Meaning                         |
-|----------|---------------------------------|
-| `size`   | size in bytes                   |
-| `status` | `FREE` or `ALLOC`               |
-| `next`   | the next block in the heap      |
-| `prev`   | the previous block in the heap  |
+## 🧱 How a heap is modelled
 
-On startup the heap contains a single 1024-byte `FREE` block.
+A heap is a **doubly linked list of `MemoryBlock`s** covering every byte, in address order:
 
-Core block operations:
+| Field | Meaning |
+|---|---|
+| `size` | block size in bytes |
+| `status` | `FREE` or `ALLOC` |
+| `next`, `prev` | neighbouring blocks |
+| `buddy`, `parentBuddy` | used only by the Buddy allocator |
 
-- **`splitBlock(size)`** — marks the block as `ALLOC` with the requested size and turns the remainder into a new `FREE` block right after it (which is then merged with any free neighbor).
-- **`mergeNext()` / `mergePrev()`** — merges the block with its free right / left neighbor (coalescing).
-- **`joinNext(n)` / `joinPrev(n)`** — "borrows" `n` bytes from a free neighbor; used by `realloc` to grow a block in place.
+A block's id in the UI is its **real address inside WebAssembly memory** — that's how `free` and `realloc` find the exact block again. No payload is stored; the visualizer tracks *which* bytes are in use.
 
-### Allocation strategies
+---
 
-Every strategy first rounds the requested size up to a multiple of 8 (`(size + 7) & ~7`).
+## ⚙️ The allocators
 
-| Strategy      | How it picks a free block                                                                                   |
-|---------------|-------------------------------------------------------------------------------------------------------------|
-| **First Fit** | Scans the heap from the start and takes the **first** free block that is large enough.                      |
-| **Next Fit**  | Starts scanning from the **last allocated block**; if nothing fits, wraps around to the start of the heap.  |
-| **Best Fit**  | Scans the whole heap and takes the **smallest** free block that still fits, minimizing wasted space.        |
+| Strategy | Picks | Free blocks merge with | Strength | Weakness |
+|---|---|---|---|---|
+| **First Fit** | first free block that fits | any free neighbour | fast, simple | small fragments pile up at the start |
+| **Next Fit** | first fit, starting after the last allocation | any free neighbour | spreads allocations out | can fragment the whole heap |
+| **Best Fit** | smallest free block that fits | any free neighbour | least wasted space per request | leaves tiny unusable slivers |
+| **Buddy** | smallest power-of-two block, split in halves | only its buddy | merging is a pointer lookup, climbs the tree level by level | internal fragmentation (rounds up to 2ⁿ) |
+| **Segregated Lists** | a slot in the zone of its size class | only neighbours in the same zone | predictable, no mixing of sizes | a full zone fails even if others are empty |
 
-### `free`
+### First Fit · Next Fit · Best Fit
 
-The block is marked `FREE` and then merged with free neighbors on both sides, so two free blocks are never left next to each other.
+Requests are rounded up to a multiple of 8 (`(size + 7) & ~7`).
 
-### `realloc`
+- **`malloc`** finds a free block with the strategy above and **splits** it: the requested part becomes `ALLOC`, the remainder stays `FREE`.
+- **`free`** marks the block `FREE` and **coalesces** it with free neighbours on both sides, so two free blocks are never adjacent.
+- **`realloc`** shrinks in place, or grows **in place** by borrowing from the free block on the right, the left, or both — and only moves the block when that's impossible. If moving fails too, the original block is left untouched.
 
-1. If the new size is 0 → behaves like `free`.
-2. If the new size is **smaller** → the block shrinks and the remainder becomes free.
-3. If it is **larger**, it tries to grow **in place**, in this order:
-   - using the free block on the right,
-   - using the free block on the left,
-   - using both free neighbors.
-4. If growing in place is not possible → it `malloc`s elsewhere and frees the old block. If that fails too, the original block is left untouched.
+### Buddy allocator
 
-### Manager and HeapFactory
+Every block is a **power of two** and knows its **buddy** — the other half of the split that created it — **through a pointer**, never by computing addresses.
 
-- **`HeapFactory`** takes a string (`"FIRST_FIT"`, `"NEXT_FIT"`, `"BEST_FIT"`) and builds the matching heap.
-- **`Manager`** holds a vector of equally sized heaps, can add or remove heaps, and serializes all of them into a single JSON object. It is the foundation for comparing strategies side by side.
+```
+                 split B                                merge L + R
+        ┌────────────────────────┐              ┌────────────────────────┐
+        │ R.parentBuddy = B.buddy│              │ L.size *= 2            │
+        │ R.buddy       = L      │              │ L.buddy = R.parentBuddy│
+        │ L.buddy       = R      │              │ delete R               │
+        └────────────────────────┘              └────────────────────────┘
 
-### Serialization
+   1024 ─ split ─▶ 512 | 512 ─ split ─▶ 256 | 256 | 512 ─ alloc ─▶ [256] | 256 | 512
+                   A ↔ B               A ↔ C   (C remembers B)
+```
 
-Each heap is turned into a JSON array, where `id` is the block's real address in WASM memory:
+- **`malloc`** rounds up to a power of two (min 16 B), takes the smallest free block that fits and halves it until it's the right size.
+- **`free`** merges the block with its buddy while the buddy is free and the same size, climbing back up the tree. `parentBuddy` gives the merged block its own buddy back, so merging can continue level after level.
+- **`realloc`** shrinks by splitting; grows in place while the block is the left half and its buddy is completely free.
+- **Any heap size works**: a non-power-of-two heap starts as its binary decomposition (`1000 = 512 + 256 + 128 + 64 + 32 + 8`), whose pieces never merge with each other.
+- **Reloading** a saved buddy heap replays the same splits, so every buddy pointer is rebuilt exactly.
+
+### Segregated Lists
+
+The heap is split into isolated **zones**, one per **size class**, plus a **large zone** for everything bigger:
+
+```
+heap = 1024 B, default classes 16 / 32 / 64
+┌──────────┬──────────┬──────────┬──────────────────────────────┐
+│  16 B    │  32 B    │  64 B    │            large             │
+│  128 B   │  128 B   │  128 B   │            640 B             │
+└──────────┴──────────┴──────────┴──────────────────────────────┘
+```
+
+- **`malloc`** uses the smallest class that fits and takes one slot **only from that zone**; bigger requests go to the large zone (first fit). A full zone **fails** — zones never borrow from each other.
+- **`free`** coalesces only inside the same zone; no block ever crosses a zone boundary.
+- **Configurable from the UI** as a `class:zoneSize` list (default `16:128,32:128,64:128`). Classes must be increasing multiples of 8, each zone a multiple of its class, and all zones must fit in the heap — the rest becomes the large zone.
+
+---
+
+## 🔌 C++ ↔ JavaScript bridge
+
+Exported from `core/bridge.cpp` with `EMSCRIPTEN_KEEPALIVE` and called from `src/App.tsx` via `Module.ccall`:
+
+| Function | Purpose |
+|---|---|
+| `wasmSetHeapSize(size)` | size used for new heaps |
+| `wasmAddHeap(type, config)` | add an empty heap (`config` only for segregated) |
+| `wasmDeleteHeap(index)` / `wasmClearHeaps()` | erase one / every heap |
+| `wasmMalloc(index, size)` | allocate in a heap |
+| `wasmFree(index, address)` | free a block |
+| `wasmRealloc(index, address, size)` | resize a block |
+| `wasmResetHeap(index)` | empty a heap, keeping its type and config |
+| `wasmGetHeaps()` | every heap as JSON |
+| `wasmReconstructHeap(type, config, json)` | rebuild a heap from a save |
+
+<details>
+<summary><b>Example JSON returned by <code>wasmGetHeaps()</code></b></summary>
 
 ```json
 [
-  {"id":"0x11a40","status":"ALLOC","size":64},
-  {"id":"0x11a60","status":"FREE","size":960}
+  {"type":"BEST_FIT","config":"","blocks":[
+    {"id":"0x11a40","status":"ALLOC","size":64},
+    {"id":"0x11a60","status":"FREE","size":960}
+  ]},
+  {"type":"SEGREGATED","config":"16:128,32:128,64:128","blocks":[
+    {"id":"0x11b00","status":"ALLOC","size":16,"zone":"16"},
+    {"id":"0x11b20","status":"FREE","size":112,"zone":"16"}
+  ]}
 ]
 ```
 
-The frontend sends that same `id` back on `free`/`realloc`, so the bridge can locate the exact block.
+</details>
 
-## C++ ↔ JavaScript bridge
+---
 
-The functions in `core/bridge.cpp` are exported with `EMSCRIPTEN_KEEPALIVE` and called from `App.tsx` via `Module.ccall(...)`:
+## 🖥️ Frontend
 
-| WASM function                | What it does                                              |
-|------------------------------|-----------------------------------------------------------|
-| `wasmCreateManager()`        | Creates the manager (only once)                           |
-| `wasmAddHeap(type)`          | Adds a heap of the given type                             |
-| `wasmDeleteHeap(index)`      | Removes a heap from the manager                           |
-| `wasmGetHeap()`              | Returns the first heap as JSON (creates it if missing)    |
-| `wasmGetHeaps()`             | Returns all heaps as JSON                                 |
-| `wasmMalloc(size)`           | Allocates `size` bytes                                    |
-| `wasmFree(address)`          | Frees the block at the given address (hex string)         |
-| `wasmRealloc(address, size)` | Resizes the block                                         |
-| `wasmReconstructHeap(json)`  | Rebuilds a heap from saved JSON                           |
-| `wasmResetHeap()`            | Destroys the current heap and creates a fresh, empty one  |
+| Component | Role |
+|---|---|
+| `App.tsx` | loads the WASM module, owns the heaps and heap size, wires every action to the bridge |
+| `Header.tsx` | title and the **Heap size** input |
+| `HeapCard.tsx` | one heap: title, **Erase Heap**, the bar and its controls |
+| `Heap.tsx` | the block bar, zone labels and the block inspector popup |
+| `MemoryBlockUI.tsx` | one block, width proportional to its size |
+| `SelectedBlockPanel.tsx` | block details + **Free** / **Realloc** |
+| `ControlPanel.tsx` | **Malloc** and **Reset Heap** |
+| `AddHeapForm.tsx` | strategy picker, segregated class editor with validation, **Add Heap** |
+| `Contexts.tsx` | React Contexts for malloc / free / realloc / reset |
 
-The React flow is always the same: **WASM call → `refreshBlocks()` → `wasmGetHeap()` → `JSON.parse` → `setBlocks`**, and the components re-render.
+Each `HeapCard` provides `free`, `realloc`, `malloc` and `reset` through **React Context**, already bound to its own heap index — so the inspector inside heap #2 acts on heap #2 without passing callbacks through every layer.
 
-## User interface
+State is saved to `localStorage` (`heaps`, `heapSize`) and restored on load; saves that no longer match the current heap size are skipped.
 
-- **Header** – the "Memory Allocator" title and the total heap size.
-- **Heap** – the main bar; each block takes up `size / 1024 * 100%` of the width.
-- **SelectedBlockPanel** – appears under the clicked block; shows its status and size and offers Free / Realloc for allocated blocks.
-- **ControlPanel** – a numeric input for Malloc (digits only, capped at 1024) and the Reset-Heap button.
+---
 
-The `malloc`, `free`, `realloc` and `reset` functions reach the components through **React Context**, so they don't have to be passed down manually as props.
+## 🏁 Getting started
 
-## Getting started
-
-### Requirements
-
-- **Node.js** 20+ and npm
-- (optional, only if you change the C++ code) **Emscripten SDK** installed in `~/.emsdk`
-- (optional) **g++** and **valgrind** for native testing
-
-### Run the frontend
-
-`heap.wasm` and `heap.js` are already committed, so you can start right away:
+The compiled `heap.wasm` and `heap.js` are committed, so Node.js is all you need:
 
 ```bash
 git clone https://github.com/alex1bondoc/Heap-Visualizer.git
 cd Heap-Visualizer
 npm install
-npm run dev
+npm run dev        # http://localhost:5173/Heap-Visualizer/
 ```
 
-Then open the address Vite prints (usually `http://localhost:5173`).
+| Command | What it does |
+|---|---|
+| `npm run dev` | development server |
+| `npm run build` | type check (`tsc -b`) + production build into `dist/` |
+| `npm run preview` | serve the production build |
+| `npm run lint` | ESLint |
 
-### Production build
+### Working on the C++ core
+
+Requires the [Emscripten SDK](https://emscripten.org/) in `~/.emsdk`:
 
 ```bash
-npm run build     # TypeScript check + Vite build into dist/
-npm run preview   # serve the build locally
+git clone https://github.com/emscripten-core/emsdk.git ~/.emsdk
+cd ~/.emsdk && ./emsdk install latest && ./emsdk activate latest
 ```
 
-### Rebuilding after changes in `core/`
+| Make target | What it does |
+|---|---|
+| `make compile-wasm` | builds `core/` with `em++` → `src/heap.js` + `public/heap.wasm` |
+| `make compile-test` | builds the native test program `core/main` with `g++` |
+| `make run-test` | runs it |
+| `make memory-test` | runs it under **Valgrind** → `valgrind.log` |
+| `make clean-test` | removes `core/main` |
 
-```bash
-source ~/.emsdk/emsdk_env.sh
-make compile-wasm
-```
-
-This generates `src/heap.js` and moves `heap.wasm` into `public/`.
-
-## Makefile targets
-
-| Target              | Description                                                                 |
-|---------------------|-----------------------------------------------------------------------------|
-| `make compile-test` | Compiles the native test program (`core/main`) with `g++`                   |
-| `make run-test`     | Runs `core/main` (creates one heap of each type and prints them as JSON)    |
-| `make memory-test`  | Runs the test under **Valgrind** and writes the report to `valgrind.log`    |
-| `make clean-test`   | Removes the test executable                                                 |
-| `make compile-wasm` | Compiles `core/` to WebAssembly with `emcc`                                 |
-
-## Current status and roadmap
-
-This is a work in progress. Worth knowing:
-
-- The UI currently works only with the **first heap** in the manager, which is a **Best Fit** heap. First Fit and Next Fit are implemented and can be tested natively, but there is no selector for them in the UI yet.
-- The heap size is fixed at **1024 bytes** (set in both `bridge.cpp` and `App.tsx`).
-- `calloc` exists in C++ but is not exposed in the UI.
-- Persisting state to `localStorage` is started: it is written under the `blocks` key, but on startup it is read from `cariceps`, so the state is not restored after a refresh yet.
-
-Ideas for next steps:
-
-- a strategy selector (First / Next / Best Fit), or showing all three heaps stacked for comparison;
-- a configurable heap size;
-- statistics: total free memory, largest free block, fragmentation ratio;
-- an operation history with undo;
-- a `calloc` button.
+After changing `core/`, run `make compile-wasm` and commit the regenerated `src/heap.js` and `public/heap.wasm`.
 
 ---
 
-**Built with:** C++ · Emscripten / WebAssembly · React 19 · TypeScript · Vite 7 · Tailwind CSS 4
+## 📦 Deployment
+
+Every push to `main` triggers [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): `npm ci` → `npm run build` → publish `dist/` to **GitHub Pages**. The WebAssembly module is prebuilt and committed, so CI doesn't need Emscripten.
+
+---
+
+## 📁 Project structure
+
+```
+Heap-Visualizer/
+├── core/                       # allocators (C++)
+│   ├── MemoryBlock.*           # block: size, status, next/prev, buddy pointers
+│   ├── Heap.*                  # base class: block list, JSON (de)serialization
+│   ├── FirstFitHeap.*  NextFitHeap.*  BestFitHeap.*
+│   ├── BuddyHeap.*             # buddy allocator
+│   ├── SegregatedHeap.*        # size-class zones, configurable
+│   ├── HeapFactory.*           # builds a heap from its type name
+│   ├── Manager.*               # owns every heap, serializes them
+│   ├── bridge.cpp              # C functions exported to JavaScript
+│   └── main.cpp                # native test program
+├── src/                        # React + TypeScript frontend
+│   ├── App.tsx
+│   ├── Components/
+│   └── heap.js                 # generated Emscripten glue
+├── public/heap.wasm            # generated WebAssembly module
+├── .github/workflows/deploy.yml
+└── Makefile
+```
+
+---
+
+## 🛣️ Roadmap
+
+- Per-heap statistics: free memory, largest free block, fragmentation ratio
+- Replay the same sequence of operations on every heap at once
+- Operation history with undo
+- Highlight a block's buddy on hover
+- Expose `calloc` in the UI
+
+---
+
+<div align="center">
+
+Built by **[Alex Bondoc](https://github.com/alex1bondoc)** · C++ · WebAssembly · React · TypeScript
+
+</div>
