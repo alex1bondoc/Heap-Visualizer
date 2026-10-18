@@ -39,8 +39,8 @@ extern "C" {
     }
     EMSCRIPTEN_KEEPALIVE
     const char* wasmGetHeap() {
-        if (manager == nullptr) {
-            wasmCreateManager();
+        wasmCreateManager();
+        if (manager->getHeaps().empty()) {
             wasmAddHeap("BEST_FIT");
         }
         static std::string json;
@@ -74,14 +74,27 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(char *json) {
         wasmCreateManager();
-        manager->getHeaps().push_back((Heap*)(new BestFitHeap(1024, json)));
+        std::vector<Heap *>& heaps = manager->getHeaps();
+        Heap* reconstructed = (Heap*)(new BestFitHeap(heap_size, json));
+        if (heaps.empty()) {
+            heaps.push_back(reconstructed);
+        }
+        else {
+            delete heaps[0];
+            heaps[0] = reconstructed;
+        }
         std::cout << manager->serialize() << std::endl;
     }
     EMSCRIPTEN_KEEPALIVE
     const void wasmResetHeap() {
-        Heap* heap = manager->getHeaps()[0];
-        delete heap;
-        wasmAddHeap("BEST_FIT");
+        wasmCreateManager();
+        std::vector<Heap *>& heaps = manager->getHeaps();
+        if (heaps.empty()) {
+            wasmAddHeap("BEST_FIT");
+            return;
+        }
+        delete heaps[0];
+        heaps[0] = HeapFactory::createHeap("BEST_FIT", heap_size);
     }
 
 }
