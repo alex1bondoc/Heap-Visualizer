@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-class SegregatedHeap : Heap {
+class SegregatedHeap : public Heap {
 private:
     // classes[i] is the slot size of zone i, zone_sizes[i] how many bytes the zone takes.
     // Whatever is left after the class zones is the zone for large requests.

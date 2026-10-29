@@ -2,7 +2,7 @@
 #include "Heap.h"
 #include <string>
 
-class BuddyHeap : Heap {
+class BuddyHeap : public Heap {
 private:
     static const int MIN_BLOCK = 16;
 

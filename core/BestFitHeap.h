@@ -2,7 +2,7 @@
 #include "Heap.h"
 #include <string>
 
-class BestFitHeap : Heap {
+class BestFitHeap : public Heap {
 public:
     BestFitHeap(int size); 
     BestFitHeap(int size, char *json);

@@ -1,6 +1,6 @@
 #include "Heap.h"
 
-class FirstFitHeap : Heap {
+class FirstFitHeap : public Heap {
 public:
     FirstFitHeap(int size);
     FirstFitHeap(int size, char *json);

@@ -1,6 +1,6 @@
 #include "Heap.h"
 
-class NextFitHeap : Heap {
+class NextFitHeap : public Heap {
 private:
     MemoryBlock *last_allocated = nullptr;
 public:
