@@ -1,5 +1,7 @@
-#include "HeapFactory.h"
+#pragma once
+#include <string>
 #include <vector>
+#include "Heap.h"
 
 class Manager {
 private:

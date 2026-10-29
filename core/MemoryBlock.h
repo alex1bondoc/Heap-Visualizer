@@ -1,4 +1,6 @@
-#include <iostream>
+#pragma once
+#include <ostream>
+#include <string>
 
 enum class Status : int {
     FREE = 0,
@@ -17,8 +19,8 @@ inline std::ostream& operator<<(std::ostream& os, const Status& status) {
 
 class MemoryBlock {
 private:
-    Status status;
     int size;
+    Status status;
 
     MemoryBlock *next;
     MemoryBlock *prev;

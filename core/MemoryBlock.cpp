@@ -1,7 +1,5 @@
 #include "MemoryBlock.h"
-#include <iostream>
 #include <sstream>
-#include <string>
 
 MemoryBlock::MemoryBlock(int size, Status status, MemoryBlock *next, MemoryBlock *prev) : size(size), status(status), next(next), prev(prev) {};
 

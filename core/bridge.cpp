@@ -5,6 +5,7 @@
     #define EMSCRIPTEN_KEEPALIVE
 #endif
 #include "Manager.h"
+#include "HeapFactory.h"
 
 int heap_size = 1024;
 Manager* manager = nullptr;

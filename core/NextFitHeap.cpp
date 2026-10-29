@@ -1,7 +1,6 @@
 #include "NextFitHeap.h"
-#include "Heap.h"
-#include "sstream"
 #include <iostream>
+#include <sstream>
 
 NextFitHeap::NextFitHeap(int size) : Heap(size), last_allocated(this->head) {};
 NextFitHeap::NextFitHeap(int size, char *json) : Heap(size, json), last_allocated(this->head) {};

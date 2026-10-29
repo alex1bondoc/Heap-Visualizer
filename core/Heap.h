@@ -1,15 +1,17 @@
 #pragma once
+#include <ostream>
+#include <string>
 #include "MemoryBlock.h"
 
 class Heap{
 protected:
-    MemoryBlock *head;
     int size;
+    MemoryBlock *head;
 public:
     Heap(int size);
     Heap(int size, char *json);
     Heap (const Heap&) = delete;
-    virtual Heap operator= (const Heap&) = delete;
+    Heap& operator=(const Heap&) = delete;
     virtual ~Heap();
 
     friend std::ostream& operator<<(std::ostream& os, const Heap& heap);

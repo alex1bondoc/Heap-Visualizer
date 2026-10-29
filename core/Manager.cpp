@@ -1,5 +1,6 @@
 #include "Manager.h"
 #include <sstream>
+#include "HeapFactory.h"
 
 Manager::Manager(int heap_size) : heap_size(heap_size) {};
 

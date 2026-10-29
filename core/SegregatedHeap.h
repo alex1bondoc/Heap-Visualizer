@@ -24,8 +24,6 @@ private:
 public:
     SegregatedHeap(int size, std::string config = "");
     SegregatedHeap(int size, char *json, std::string config = "");
-    SegregatedHeap(const SegregatedHeap&) = delete;
-    SegregatedHeap operator=(const SegregatedHeap&) = delete;
 
     MemoryBlock *myMalloc(int size) override;
     MemoryBlock *myCalloc(int size) override;

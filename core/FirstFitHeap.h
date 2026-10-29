@@ -1,11 +1,12 @@
+#pragma once
+#include <ostream>
+#include <string>
 #include "Heap.h"
 
 class FirstFitHeap : public Heap {
 public:
     FirstFitHeap(int size);
     FirstFitHeap(int size, char *json);
-    FirstFitHeap(const FirstFitHeap&) = delete;
-    FirstFitHeap operator=(const FirstFitHeap) = delete;
 
     friend std::ostream& operator<<(std::ostream& os, const FirstFitHeap& heap);
     

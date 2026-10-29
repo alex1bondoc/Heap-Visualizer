@@ -1,6 +1,4 @@
 #include <iostream>
-#include <cstring>
-#include <sstream>
 
 #include "Manager.h"
 

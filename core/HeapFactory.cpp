@@ -1,4 +1,9 @@
 #include "HeapFactory.h"
+#include "BestFitHeap.h"
+#include "FirstFitHeap.h"
+#include "NextFitHeap.h"
+#include "BuddyHeap.h"
+#include "SegregatedHeap.h"
 
 HeapType stringToHeapType(std::string type){
     if (type == "FIRST_FIT") {
@@ -24,19 +29,19 @@ Heap *HeapFactory::createHeap(std::string type, int size, std::string config) {
 
     switch (t) {
         case HeapType::FIRST_FIT:
-            return (Heap *)HeapFactory::createFirstFitHeap(size);
+            return HeapFactory::createFirstFitHeap(size);
             break;
         case HeapType::NEXT_FIT:
-            return (Heap *)HeapFactory::createNextFitHeap(size);
+            return HeapFactory::createNextFitHeap(size);
             break;
         case HeapType::BEST_FIT:
-            return (Heap *)HeapFactory::createBestFitHeap(size);
+            return HeapFactory::createBestFitHeap(size);
             break;
         case HeapType::BUDDY:
-            return (Heap *)new BuddyHeap(size);
+            return HeapFactory::createBuddyHeap(size);
             break;
         case HeapType::SEGREGATED:
-            return (Heap *)new SegregatedHeap(size, config);
+            return HeapFactory::createSegregatedHeap(size, config);
             break;
         default:
             return nullptr;
@@ -48,15 +53,15 @@ Heap *HeapFactory::createHeap(std::string type, int size, char *json, std::strin
 
     switch (t) {
         case HeapType::FIRST_FIT:
-            return (Heap *)new FirstFitHeap(size, json);
+            return new FirstFitHeap(size, json);
         case HeapType::NEXT_FIT:
-            return (Heap *)new NextFitHeap(size, json);
+            return new NextFitHeap(size, json);
         case HeapType::BEST_FIT:
-            return (Heap *)new BestFitHeap(size, json);
+            return new BestFitHeap(size, json);
         case HeapType::BUDDY:
-            return (Heap *)new BuddyHeap(size, json);
+            return new BuddyHeap(size, json);
         case HeapType::SEGREGATED:
-            return (Heap *)new SegregatedHeap(size, json, config);
+            return new SegregatedHeap(size, json, config);
         default:
             return nullptr;
     }
@@ -69,4 +74,10 @@ FirstFitHeap *HeapFactory::createFirstFitHeap(int size) {
 }
 NextFitHeap *HeapFactory::createNextFitHeap(int size) {
     return new NextFitHeap(size);
+}
+BuddyHeap *HeapFactory::createBuddyHeap(int size) {
+    return new BuddyHeap(size);
+}
+SegregatedHeap *HeapFactory::createSegregatedHeap(int size, std::string config) {
+    return new SegregatedHeap(size, config);
 }

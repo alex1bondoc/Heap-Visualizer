@@ -1,13 +1,12 @@
-#include <iostream>
-#include "Heap.h"
+#pragma once
+#include <ostream>
 #include <string>
+#include "Heap.h"
 
 class BestFitHeap : public Heap {
 public:
     BestFitHeap(int size); 
     BestFitHeap(int size, char *json);
-    BestFitHeap (const BestFitHeap&) = delete;
-    BestFitHeap operator= (const BestFitHeap&) = delete;
     
     friend std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap);
 

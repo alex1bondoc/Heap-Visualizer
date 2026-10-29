@@ -1,3 +1,6 @@
+#pragma once
+#include <ostream>
+#include <string>
 #include "Heap.h"
 
 class NextFitHeap : public Heap {
@@ -6,8 +9,6 @@ private:
 public:
     NextFitHeap(int size);
     NextFitHeap(int size, char *json);
-    NextFitHeap(const NextFitHeap&) = delete;
-    NextFitHeap operator=(const NextFitHeap) = delete;
 
     friend std::ostream& operator<<(std::ostream& os, const NextFitHeap& heap);
     

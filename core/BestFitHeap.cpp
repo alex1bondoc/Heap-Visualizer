@@ -1,7 +1,5 @@
 #include "BestFitHeap.h"
 #include <sstream>
-#include <cstring>
-#include <iostream>
 
 BestFitHeap::BestFitHeap(int size) : Heap(size) {};
 BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json) {};

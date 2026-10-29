@@ -1,6 +1,7 @@
 #include "Heap.h"
-#include <sstream>
 #include <cstring>
+#include <iostream>
+#include <sstream>
 
 Heap::Heap(int size) : size(size), head(new MemoryBlock(size, Status::FREE)) {};
 Heap::Heap(int size, char *json) : size(size), head(nullptr){
