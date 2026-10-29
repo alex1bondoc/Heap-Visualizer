@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <span>
+#include <memory>
 #include <string_view>
 #include "BlockInfo.h"
 #include "Heap.h"
@@ -21,12 +22,6 @@ enum class HeapType : int {
 
 class HeapFactory {
 public:
-    static Heap *createHeap(std::string_view type, int size, std::string_view config);
-    static Heap *createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config);
-private:
-    static BestFitHeap *createBestFitHeap(int size);
-    static FirstFitHeap *createFirstFitHeap(int size);
-    static NextFitHeap *createNextFitHeap(int size);
-    static BuddyHeap *createBuddyHeap(int size);
-    static SegregatedHeap *createSegregatedHeap(int size, std::string_view config);
+    static std::unique_ptr<Heap> createHeap(std::string_view type, int size, std::string_view config);
+    static std::unique_ptr<Heap> createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config);
 };

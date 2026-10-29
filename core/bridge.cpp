@@ -1,21 +1,17 @@
+#include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 #ifdef __EMSCRIPTEN__
     #include <emscripten.h>
 #else
     #define EMSCRIPTEN_KEEPALIVE
 #endif
-#include "Manager.h"
-#include "HeapFactory.h"
-#include <optional>
-#include <string_view>
-#include <vector>
 #include "BlockInfo.h"
-int heap_size = 1024;
-Manager* manager = nullptr;
+#include "HeapFactory.h"
+#include "Manager.h"
 
-bool validIndex(const int index) {
-    return manager != nullptr && index >= 0 && index < (int)manager->getHeaps().size();
-}
+Manager manager{1024};
 
 MemoryBlock *toBlock(const char *address) {
     unsigned long adressNumerical = std::stoul(address, nullptr, 16);
@@ -23,88 +19,61 @@ MemoryBlock *toBlock(const char *address) {
 }
 
 extern "C" {
-    
-    EMSCRIPTEN_KEEPALIVE
-    const void wasmCreateManager() {
-        if (manager == nullptr) {
-            manager = new Manager(heap_size);
-        }
-    }
 
     EMSCRIPTEN_KEEPALIVE
-    const void wasmAddHeap(const char* type, const char* config) {
-        wasmCreateManager();
-        manager->addHeap(std::string_view(type), std::string_view(config));
-    }
-
-    EMSCRIPTEN_KEEPALIVE
-    const void wasmDeleteHeap(const int index) {
-        if (!validIndex(index)) {
-            return;
-        }
-        manager->deleteHeap(index);
+    void wasmAddHeap(const char *type, const char *config) {
+        manager.addHeap(type, config);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmSetHeapSize(const int size) {
-        wasmCreateManager();
-        heap_size = size;
-        manager->setHeapSize(size);
+    void wasmDeleteHeap(const int index) {
+        manager.deleteHeap(index);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmClearHeaps() {
-        wasmCreateManager();
-        manager->clearHeaps();
+    void wasmSetHeapSize(const int size) {
+        manager.setHeapSize(size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const char* wasmGetHeaps() {
-        wasmCreateManager();
+    void wasmClearHeaps() {
+        manager.clearHeaps();
+    }
+    EMSCRIPTEN_KEEPALIVE
+    const char *wasmGetHeaps() {
         static std::string json;
-        json = manager->serialize();
+        json = manager.serialize();
         return json.c_str();
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmMalloc(const int index, const int size) {
-        if (!validIndex(index)) {
-            return;
+    void wasmMalloc(const int index, const int size) {
+        if (Heap *heap = manager.heap(index)) {
+            heap->myMalloc(size);
         }
-        manager->getHeaps()[index]->myMalloc(size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmFree(const int index, const char *address) {
-        if (!validIndex(index) || address == nullptr) {
-            return;
+    void wasmFree(const int index, const char *address) {
+        if (Heap *heap = manager.heap(index); heap != nullptr && address != nullptr) {
+            heap->myFree(toBlock(address));
         }
-        manager->getHeaps()[index]->myFree(toBlock(address));
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmRealloc(const int index, const char *address, const int size) {
-        if (!validIndex(index) || address == nullptr) {
-            return;
+    void wasmRealloc(const int index, const char *address, const int size) {
+        if (Heap *heap = manager.heap(index); heap != nullptr && address != nullptr) {
+            heap->myRealloc(toBlock(address), size);
         }
-        manager->getHeaps()[index]->myRealloc(toBlock(address), size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmReconstructHeap(const char *type, const char *config, const char *json) {
-        wasmCreateManager();
+    void wasmReconstructHeap(const char *type, const char *config, const char *json) {
         std::optional<std::vector<BlockInfo>> blocks = parseBlocks(json);
         if (!blocks) {
             return;
         }
-        Heap* reconstructed = HeapFactory::createHeap(type, heap_size, *blocks, config);
+        std::unique_ptr<Heap> reconstructed = HeapFactory::createHeap(type, manager.getHeapSize(), *blocks, config);
         if (reconstructed != nullptr) {
-            manager->getHeaps().push_back(reconstructed);
+            manager.addHeap(std::move(reconstructed));
         }
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmResetHeap(const int index) {
-        if (!validIndex(index)) {
-            return;
-        }
-        std::vector<Heap *>& heaps = manager->getHeaps();
-        std::string_view type = heaps[index]->getType();
-        std::string config = heaps[index]->getConfig();
-        delete heaps[index];
-        heaps[index] = HeapFactory::createHeap(type, heap_size, config);
+    void wasmResetHeap(const int index) {
+        manager.resetHeap(index);
     }
 
 }

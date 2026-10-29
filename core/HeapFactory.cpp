@@ -25,60 +25,39 @@ HeapType stringToHeapType(std::string_view type){
     return HeapType::FIRST_FIT;
 }
 
-Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view config) {
+std::unique_ptr<Heap> HeapFactory::createHeap(std::string_view type, int size, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
         case HeapType::FIRST_FIT:
-            return HeapFactory::createFirstFitHeap(size);
-            break;
+            return std::make_unique<FirstFitHeap>(size);
         case HeapType::NEXT_FIT:
-            return HeapFactory::createNextFitHeap(size);
-            break;
+            return std::make_unique<NextFitHeap>(size);
         case HeapType::BEST_FIT:
-            return HeapFactory::createBestFitHeap(size);
-            break;
+            return std::make_unique<BestFitHeap>(size);
         case HeapType::BUDDY:
-            return HeapFactory::createBuddyHeap(size);
-            break;
+            return std::make_unique<BuddyHeap>(size);
         case HeapType::SEGREGATED:
-            return HeapFactory::createSegregatedHeap(size, config);
-            break;
+            return std::make_unique<SegregatedHeap>(size, config);
         default:
             return nullptr;
-            break;
     }
 }
-Heap *HeapFactory::createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config) {
+std::unique_ptr<Heap> HeapFactory::createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
         case HeapType::FIRST_FIT:
-            return new FirstFitHeap(size, blocks);
+            return std::make_unique<FirstFitHeap>(size, blocks);
         case HeapType::NEXT_FIT:
-            return new NextFitHeap(size, blocks);
+            return std::make_unique<NextFitHeap>(size, blocks);
         case HeapType::BEST_FIT:
-            return new BestFitHeap(size, blocks);
+            return std::make_unique<BestFitHeap>(size, blocks);
         case HeapType::BUDDY:
-            return new BuddyHeap(size, blocks);
+            return std::make_unique<BuddyHeap>(size, blocks);
         case HeapType::SEGREGATED:
-            return new SegregatedHeap(size, blocks, config);
+            return std::make_unique<SegregatedHeap>(size, blocks, config);
         default:
             return nullptr;
     }
-}
-BestFitHeap *HeapFactory::createBestFitHeap(int size) {
-    return new BestFitHeap(size);
-}
-FirstFitHeap *HeapFactory::createFirstFitHeap(int size) {
-    return new FirstFitHeap(size);
-}
-NextFitHeap *HeapFactory::createNextFitHeap(int size) {
-    return new NextFitHeap(size);
-}
-BuddyHeap *HeapFactory::createBuddyHeap(int size) {
-    return new BuddyHeap(size);
-}
-SegregatedHeap *HeapFactory::createSegregatedHeap(int size, std::string_view config) {
-    return new SegregatedHeap(size, config);
 }
