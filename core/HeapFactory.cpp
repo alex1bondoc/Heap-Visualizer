@@ -49,7 +49,7 @@ Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view 
             break;
     }
 }
-Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view json, std::string_view config) {
+Heap *HeapFactory::createHeap(std::string_view type, int size, char* json, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {

@@ -11,7 +11,7 @@ private:
     std::vector<int> classes;
     std::vector<int> zone_sizes;
 
-    void parseConfig(std::string config);
+    void parseConfig(std::string_view config);
     void setDefaultConfig();
     void createZones();
     int classZonesSize() const;

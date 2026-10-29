@@ -2,44 +2,56 @@
 #include <sstream>
 #include <cstdlib>
 #include <string_view>
+#include <charconv>
+#include <optional>
 
 SegregatedHeap::SegregatedHeap(int size, std::string_view config) : Heap(size) {
-    this->parseConfig(std::string(config));
+    this->parseConfig(config);
     this->createZones();
 };
 SegregatedHeap::SegregatedHeap(int size, char *json, std::string_view config) : Heap(size, json) {
-    this->parseConfig(std::string(config));
+    this->parseConfig(config);
 };
 
 // Config format: "class:zoneSize,class:zoneSize,..." e.g. "16:128,32:128,64:128".
 // Classes must be increasing multiples of 8, every zone a multiple of its class,
 // and the zones must fit in the heap. Anything else falls back to the default.
-void SegregatedHeap::parseConfig(std::string config) {
+void SegregatedHeap::parseConfig(std::string_view config) {
     this->classes.clear();
     this->zone_sizes.clear();
-    std::stringstream ss(config);
-    std::string entry;
-    int total = 0;
-    bool valid = !config.empty();
-    while (valid && std::getline(ss, entry, ',')) {
-        size_t colon = entry.find(':');
-        if (colon == std::string::npos) {
-            valid = false;
-            break;
+    if (config.empty()) {
+        this->setDefaultConfig();
+        return;
+    }
+    int total_size = 0;
+    int last_class = 0;
+    std::string_view remaining = config;
+    while (!remaining.empty()) {
+        size_t comma_pos = remaining.find(',');
+        std::string_view pair = remaining.substr(0, comma_pos);
+        size_t colon_pos = pair.find(':');
+        if (colon_pos == std::string_view::npos) {
+            this->setDefaultConfig();
+            return; 
         }
-        int size_class = std::atoi(entry.substr(0, colon).c_str());
-        int zone_size = std::atoi(entry.substr(colon + 1).c_str());
-        bool increasing = this->classes.empty() || size_class > this->classes.back();
-        if (size_class <= 0 || size_class % 8 != 0 || !increasing || zone_size < size_class || zone_size % size_class != 0) {
-            valid = false;
-            break;
+        std::string_view class_str = pair.substr(0, colon_pos);
+        std::string_view zone_size_str = pair.substr(colon_pos + 1);
+        int size_class, zone_size;
+        auto [ptr1, ec1] = std::from_chars(class_str.data(), class_str.data() + class_str.size(), size_class);
+        auto [ptr2, ec2] = std::from_chars(zone_size_str.data(), zone_size_str.data() + zone_size_str.size(), zone_size);
+        if (ec1 != std::errc() || ec2 != std::errc() || size_class <= 0 || zone_size <= 0 || size_class % 8 != 0 || zone_size % size_class != 0 || size_class <= last_class || total_size + zone_size > this->getSize()) {
+            this->setDefaultConfig();
+            return; 
         }
-        total += zone_size;
         this->classes.push_back(size_class);
         this->zone_sizes.push_back(zone_size);
-    }
-    if (!valid || total > this->getSize()) {
-        this->setDefaultConfig();
+        total_size += zone_size;
+        last_class = size_class;
+        if (comma_pos != std::string_view::npos) {
+            remaining = remaining.substr(comma_pos + 1);
+        } else {
+            break;
+        }
     }
 }
 

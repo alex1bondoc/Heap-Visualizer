@@ -20,7 +20,7 @@ enum class HeapType : int {
 class HeapFactory {
 public:
     static Heap *createHeap(std::string_view type, int size, std::string_view config);
-    static Heap *createHeap(std::string_view type, int size, std::string_view json, std::string_view config);
+    static Heap *createHeap(std::string_view type, int size, char* json, std::string_view config);
 private:
     static BestFitHeap *createBestFitHeap(int size);
     static FirstFitHeap *createFirstFitHeap(int size);
