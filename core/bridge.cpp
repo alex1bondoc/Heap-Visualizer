@@ -6,7 +6,7 @@
 #endif
 #include "Manager.h"
 #include "HeapFactory.h"
-
+#include <string_view>
 int heap_size = 1024;
 Manager* manager = nullptr;
 
@@ -31,7 +31,7 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmAddHeap(const char* type, const char* config) {
         wasmCreateManager();
-        manager->addHeap(std::string(type), std::string(config));
+        manager->addHeap(std::string_view(type), std::string_view(config));
     }
 
     EMSCRIPTEN_KEEPALIVE
@@ -83,7 +83,7 @@ extern "C" {
     EMSCRIPTEN_KEEPALIVE
     const void wasmReconstructHeap(const char *type, const char *config, char *json) {
         wasmCreateManager();
-        Heap* reconstructed = HeapFactory::createHeap(std::string(type), heap_size, json, std::string(config));
+        Heap* reconstructed = HeapFactory::createHeap(std::string_view(type), heap_size, std::string_view(json), std::string_view(config));
         if (reconstructed != nullptr) {
             manager->getHeaps().push_back(reconstructed);
         }

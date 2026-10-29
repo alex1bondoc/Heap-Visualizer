@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <string_view>
 #include "Heap.h"
 
 class BestFitHeap;
@@ -18,12 +19,12 @@ enum class HeapType : int {
 
 class HeapFactory {
 public:
-    static Heap *createHeap(std::string type, int size, std::string config = "");
-    static Heap *createHeap(std::string type, int size, char *json, std::string config = "");
+    static Heap *createHeap(std::string_view type, int size, std::string_view config);
+    static Heap *createHeap(std::string_view type, int size, std::string_view json, std::string_view config);
 private:
     static BestFitHeap *createBestFitHeap(int size);
     static FirstFitHeap *createFirstFitHeap(int size);
     static NextFitHeap *createNextFitHeap(int size);
     static BuddyHeap *createBuddyHeap(int size);
-    static SegregatedHeap *createSegregatedHeap(int size, std::string config);
+    static SegregatedHeap *createSegregatedHeap(int size, std::string_view config);
 };

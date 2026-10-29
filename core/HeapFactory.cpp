@@ -4,8 +4,9 @@
 #include "NextFitHeap.h"
 #include "BuddyHeap.h"
 #include "SegregatedHeap.h"
+#include <string_view>
 
-HeapType stringToHeapType(std::string type){
+HeapType stringToHeapType(std::string_view type){
     if (type == "FIRST_FIT") {
         return HeapType::FIRST_FIT;
     }
@@ -24,7 +25,7 @@ HeapType stringToHeapType(std::string type){
     return HeapType::FIRST_FIT;
 }
 
-Heap *HeapFactory::createHeap(std::string type, int size, std::string config) {
+Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
@@ -48,7 +49,7 @@ Heap *HeapFactory::createHeap(std::string type, int size, std::string config) {
             break;
     }
 }
-Heap *HeapFactory::createHeap(std::string type, int size, char *json, std::string config) {
+Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view json, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
@@ -78,6 +79,6 @@ NextFitHeap *HeapFactory::createNextFitHeap(int size) {
 BuddyHeap *HeapFactory::createBuddyHeap(int size) {
     return new BuddyHeap(size);
 }
-SegregatedHeap *HeapFactory::createSegregatedHeap(int size, std::string config) {
+SegregatedHeap *HeapFactory::createSegregatedHeap(int size, std::string_view config) {
     return new SegregatedHeap(size, config);
 }

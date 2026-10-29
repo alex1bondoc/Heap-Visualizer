@@ -1,6 +1,7 @@
 #pragma once
 #include "Heap.h"
 #include <string>
+#include <string_view>
 #include <vector>
 
 class SegregatedHeap : public Heap {
@@ -22,8 +23,8 @@ private:
     void splitInZone(MemoryBlock *block, int size);
     void mergeInZone(MemoryBlock *block);
 public:
-    SegregatedHeap(int size, std::string config = "");
-    SegregatedHeap(int size, char *json, std::string config = "");
+    SegregatedHeap(int size, std::string_view config);
+    SegregatedHeap(int size, char *json, std::string_view config);
 
     MemoryBlock *myMalloc(int size) override;
     MemoryBlock *myCalloc(int size) override;

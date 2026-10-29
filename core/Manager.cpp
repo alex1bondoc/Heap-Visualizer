@@ -1,5 +1,6 @@
 #include "Manager.h"
 #include <sstream>
+#include <string_view>
 #include "HeapFactory.h"
 
 Manager::Manager(int heap_size) : heap_size(heap_size) {};
@@ -11,7 +12,7 @@ Manager::~Manager() {
     this->heaps.clear();
 }
 
-void Manager::addHeap(std::string type, std::string config){
+void Manager::addHeap(std::string_view type, std::string_view config){
     this->heaps.push_back(HeapFactory::createHeap(type, this->heap_size, config));
 }
 void Manager::deleteHeap(int index){

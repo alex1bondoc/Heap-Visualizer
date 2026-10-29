@@ -1,13 +1,14 @@
 #include "SegregatedHeap.h"
 #include <sstream>
 #include <cstdlib>
+#include <string_view>
 
-SegregatedHeap::SegregatedHeap(int size, std::string config) : Heap(size) {
-    this->parseConfig(config);
+SegregatedHeap::SegregatedHeap(int size, std::string_view config) : Heap(size) {
+    this->parseConfig(std::string(config));
     this->createZones();
 };
-SegregatedHeap::SegregatedHeap(int size, char *json, std::string config) : Heap(size, json) {
-    this->parseConfig(config);
+SegregatedHeap::SegregatedHeap(int size, char *json, std::string_view config) : Heap(size, json) {
+    this->parseConfig(std::string(config));
 };
 
 // Config format: "class:zoneSize,class:zoneSize,..." e.g. "16:128,32:128,64:128".
