@@ -25,10 +25,10 @@ export function HeapCard({index, type, size, blocks, malloc, free, realloc, rese
     erase: () => void,
 }) {
     return (
-        <div className="flex flex-col w-full max-w-5xl mx-auto bg-slate-800/50 border-2 border-slate-600 rounded-xl p-3 gap-2 transition-all hover:border-slate-100 hover:shadow-[0_0_15px_rgba(241,245,249,0.35)]">
-            <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-col w-full max-w-5xl mx-auto bg-slate-800/50 border-2 border-slate-600 rounded-xl p-2 sm:p-3 gap-2 transition-all hover:border-slate-100 hover:shadow-[0_0_15px_rgba(241,245,249,0.35)]">
+            <div className="flex flex-row items-center justify-between gap-2">
                 <h2 className="text-lg font-bold text-white">Heap #{index + 1} <span className="text-slate-400 font-normal">· {heapTypeLabels[type]}</span></h2>
-                <button className="bg-red-500 hover:bg-red-700 h-8 px-3 rounded-lg text-sm font-bold transition-colors" onClick={() => erase()}>Erase Heap</button>
+                <button className="bg-red-500 hover:bg-red-700 h-8 px-3 shrink-0 rounded-lg text-sm font-bold transition-colors" onClick={() => erase()}>Erase Heap</button>
             </div>
             <ReallocFunctionContext value={realloc}>
                 <FreeFunctionContext value={free}>

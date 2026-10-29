@@ -28,7 +28,10 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
     const zones = getZones(blocks);
     const onHover = (e: React.MouseEvent<HTMLDivElement>, block : MemoryBlock) => {
         const rec = e.currentTarget.getBoundingClientRect();
-        setPosition({x: rec.left + rec.width / 2, y: rec.bottom});
+        // Keep the 320px wide panel inside the window for blocks near the edges.
+        const half = 160 + 8;
+        const x = Math.min(Math.max(rec.left + rec.width / 2, half), window.innerWidth - half);
+        setPosition({x, y: rec.bottom});
         setSelectedBlock(block);
 
     }
@@ -54,10 +57,15 @@ export default function Heap({size, blocks} : {size: number, blocks: MemoryBlock
                     ))}
                 </div>
             }
-            {selectedBlock !== null && 
-                <div style={{position: 'fixed', left: `${position.x}px`, top: `${position.y + 4}px`}} className="z-50 -translate-x-1/2">
-                    <SelectedBlockPanel block={selectedBlock} maxSize={size} onHover={onHover} onExit={onExit}/>
-                </div>
+            {selectedBlock !== null &&
+                <>
+                    {/* On phones the panel is a bottom sheet over a backdrop that closes it. */}
+                    <div className="fixed inset-0 z-40 bg-black/50 sm:hidden" onClick={onExit}></div>
+                    <div style={{'--x': `${position.x}px`, '--y': `${position.y + 4}px`} as React.CSSProperties}
+                        className="fixed inset-x-0 bottom-0 z-50 p-3 sm:p-0 sm:inset-x-auto sm:bottom-auto sm:left-(--x) sm:top-(--y) sm:-translate-x-1/2">
+                        <SelectedBlockPanel block={selectedBlock} maxSize={size} onHover={onHover} onExit={onExit}/>
+                    </div>
+                </>
             }
         </div>
         

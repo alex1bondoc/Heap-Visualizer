@@ -18,12 +18,12 @@ export default function Header({size, resize} : {size: number, resize: (size: nu
         resize(value);
     }
     return (
-        <div className="flex flex-row w-full bg-slate-800 h-13 items-center justify-between">
-            <h1 className="text-2xl font-bold text-white m-5 me-">Memory Allocator</h1>
-            <div className="flex flex-row items-center gap-2 m-5">
+        <div className="flex flex-row flex-wrap w-full bg-slate-800 items-center justify-between gap-x-4 gap-y-2 px-3 py-2 sm:px-5 sm:min-h-13">
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Memory Allocator</h1>
+            <div className="flex flex-row items-center gap-2">
                 <span className="text-white font-bold">Heap size</span>
                 <input value={input} onChange={handleChange} onKeyDown={(e) => {if (e.key === 'Enter') apply();}}
-                    className="font-mono px-3 h-9 w-28 bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-lg text-right"></input>
+                    className="font-mono px-3 h-9 w-24 sm:w-28 bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-lg text-right"></input>
                 <span className="text-white">bytes</span>
                 <button className="bg-amber-400 hover:bg-amber-600 h-9 px-4 rounded-lg font-bold transition-colors"
                     title="Changing the size resets every heap" onClick={apply}>Apply</button>

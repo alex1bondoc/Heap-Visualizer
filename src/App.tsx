@@ -151,9 +151,9 @@ function App() {
         refreshHeaps();
     }
     return (
-        <div className="flex flex-col h-screen w-full bg-slate-900">
+        <div className="flex flex-col h-dvh w-full bg-slate-900">
             <Header size={heapSize} resize={resizeHeaps}></Header>
-            <div className="flex flex-col w-full flex-1 overflow-y-auto p-4 gap-1">
+            <div className="flex flex-col w-full flex-1 overflow-y-auto p-2 sm:p-4 gap-2 sm:gap-1">
                 {heaps.map((heap: HeapState, index: number) => (
                     <HeapCard
                         key={index}

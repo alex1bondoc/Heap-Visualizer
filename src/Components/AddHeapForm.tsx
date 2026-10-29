@@ -46,7 +46,7 @@ function validate(classes: SizeClass[], heapSize: number): string | null {
     return null;
 }
 
-const inputStyle = "font-mono px-2 h-8 w-20 bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-lg text-right";
+const inputStyle = "font-mono px-2 h-8 w-20 bg-slate-700 text-white border border-slate-600 outline-none focus:ring-2 focus:ring-amber-400 rounded-lg text-right text-base sm:text-sm";
 
 export function AddHeapForm({heapSize, addHeap}: {heapSize: number, addHeap: (type: HeapType, config: string) => void}) {
     const [type, setType] = useState<HeapType>('BEST_FIT');
@@ -67,7 +67,7 @@ export function AddHeapForm({heapSize, addHeap}: {heapSize: number, addHeap: (ty
         setClasses([...classes, {size, zone: size * 2}]);
     };
     return (
-        <div className="flex flex-col w-full max-w-5xl mx-auto items-center gap-3 border-2 border-dashed border-slate-600 rounded-xl p-3 transition-all hover:border-slate-100">
+        <div className="flex flex-col w-full max-w-5xl mx-auto items-center gap-3 border-2 border-dashed border-slate-600 rounded-xl p-2 sm:p-3 transition-all hover:border-slate-100">
             <div className="flex flex-row items-center justify-center gap-2">
                 <select value={type} onChange={(e) => setType(e.target.value as HeapType)}
                     className="h-10 px-3 bg-slate-700 text-white border border-slate-600 rounded-xl outline-none focus:ring-2 focus:ring-amber-400">
