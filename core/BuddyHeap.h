@@ -8,7 +8,7 @@ private:
 
     void createTopBlocks();
     void splitHalf(MemoryBlock *block);
-    bool canMerge(MemoryBlock *block);
+    bool canMerge(MemoryBlock *block) const;
     MemoryBlock *mergeWithBuddy(MemoryBlock *block);
 public:
     BuddyHeap(int size);
@@ -19,5 +19,5 @@ public:
     MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
     void myFree(MemoryBlock *block) override;
 
-    std::string getType() override { return "BUDDY"; }
+    std::string getType() const override { return "BUDDY"; }
 };

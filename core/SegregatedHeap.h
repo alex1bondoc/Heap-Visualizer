@@ -13,12 +13,12 @@ private:
     void parseConfig(std::string config);
     void setDefaultConfig();
     void createZones();
-    int classZonesSize();
-    int zoneOf(int offset);
-    int zoneFor(int size);
-    int allocationSize(int size);
-    std::string zoneLabel(int zone);
-    int offsetOf(MemoryBlock *block);
+    int classZonesSize() const;
+    int zoneOf(int offset) const;
+    int zoneFor(int size) const;
+    int allocationSize(int size) const;
+    std::string zoneLabel(int zone) const;
+    int offsetOf(MemoryBlock *block) const;
     void splitInZone(MemoryBlock *block, int size);
     void mergeInZone(MemoryBlock *block);
 public:
@@ -30,7 +30,7 @@ public:
     MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
     void myFree(MemoryBlock *block) override;
 
-    std::string serialize() override;
-    std::string getType() override { return "SEGREGATED"; }
-    std::string getConfig() override;
+    std::string serialize() const override;
+    std::string getType() const override { return "SEGREGATED"; }
+    std::string getConfig() const override;
 };

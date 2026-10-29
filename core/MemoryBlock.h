@@ -42,12 +42,12 @@ public:
     void setBuddy(MemoryBlock *buddy) { this->buddy = buddy; }
     void setParentBuddy(MemoryBlock *parentBuddy) { this->parentBuddy = parentBuddy; }
 
-    int getSize() { return size; }
-    Status getStatus() { return status; }
-    MemoryBlock *getNext() { return next; }
-    MemoryBlock *getPrev() { return prev; }
-    MemoryBlock *getBuddy() { return buddy; }
-    MemoryBlock *getParentBuddy() { return parentBuddy; }
+    int getSize() const { return size; }
+    Status getStatus() const { return status; }
+    MemoryBlock *getNext() const { return next; }
+    MemoryBlock *getPrev() const { return prev; }
+    MemoryBlock *getBuddy() const { return buddy; }
+    MemoryBlock *getParentBuddy() const { return parentBuddy; }
 
     void removeCurrent(); 
 
@@ -59,5 +59,5 @@ public:
     void mergeNext(); 
     void mergePrev(); 
 
-    std::string serialize();
+    std::string serialize() const;
 };

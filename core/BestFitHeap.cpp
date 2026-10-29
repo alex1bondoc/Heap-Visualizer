@@ -125,7 +125,7 @@ void BestFitHeap::myFree(MemoryBlock *block) {
     }
 }
 
-std::string BestFitHeap::serialize() {
+std::string BestFitHeap::serialize() const {
     std::ostringstream ss;
     MemoryBlock *aux = this->head;
     ss << "[";

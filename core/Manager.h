@@ -12,7 +12,7 @@ public:
     ~Manager();
     
     std::vector<Heap *>& getHeaps() { return heaps; }
-    int getHeapSize() { return heap_size; }
+    int getHeapSize() const { return heap_size; }
 
     void setHeapSize(int heap_size) { this->heap_size = heap_size; }
     void setHeaps(std::vector<Heap *> heaps) { this->heaps = heaps; }
@@ -21,5 +21,5 @@ public:
     void deleteHeap(int index);
     void clearHeaps();
 
-    std::string serialize();
+    std::string serialize() const;
 };

@@ -121,7 +121,7 @@ void FirstFitHeap::myFree(MemoryBlock *block) {
     }
 }
 
-std::string FirstFitHeap::serialize() {
+std::string FirstFitHeap::serialize() const {
     std::ostringstream ss;
     MemoryBlock *aux = this->head;
     ss << "[";

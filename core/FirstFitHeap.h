@@ -16,6 +16,6 @@ public:
     MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
     void myFree(MemoryBlock *block) override;
 
-    std::string serialize() override;
-    std::string getType() override { return "FIRST_FIT"; }
+    std::string serialize() const override;
+    std::string getType() const override { return "FIRST_FIT"; }
 };

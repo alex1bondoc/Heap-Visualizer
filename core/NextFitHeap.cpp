@@ -153,7 +153,7 @@ void NextFitHeap::myFree(MemoryBlock *block) {
     if (!block->getPrev()) this->setHead(block);
 }
 
-std::string NextFitHeap::serialize() {
+std::string NextFitHeap::serialize() const {
     std::ostringstream ss;
     MemoryBlock *aux = this->head;
     ss << "[";

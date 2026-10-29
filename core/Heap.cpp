@@ -77,7 +77,7 @@ std::ostream& operator<<(std::ostream& os, const Heap& heap) {
     return os;
 }
 
-std::string Heap::serialize() {
+std::string Heap::serialize() const {
     std::ostringstream ss;
     MemoryBlock *aux = this->head;
     ss << "[";

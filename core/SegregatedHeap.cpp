@@ -55,7 +55,7 @@ void SegregatedHeap::setDefaultConfig() {
     }
 }
 
-std::string SegregatedHeap::getConfig() {
+std::string SegregatedHeap::getConfig() const {
     std::ostringstream ss;
     for (size_t i = 0; i < this->classes.size(); ++i) {
         if (i > 0) {
@@ -88,7 +88,7 @@ void SegregatedHeap::createZones() {
     }
 }
 
-int SegregatedHeap::classZonesSize() {
+int SegregatedHeap::classZonesSize() const {
     int total = 0;
     for (int zone_size : this->zone_sizes) {
         total += zone_size;
@@ -97,7 +97,7 @@ int SegregatedHeap::classZonesSize() {
 }
 
 // Zones 0..classes.size()-1 are the class zones, classes.size() is the large zone.
-int SegregatedHeap::zoneOf(int offset) {
+int SegregatedHeap::zoneOf(int offset) const {
     int end = 0;
     for (size_t zone = 0; zone < this->zone_sizes.size(); ++zone) {
         end += this->zone_sizes[zone];
@@ -108,7 +108,7 @@ int SegregatedHeap::zoneOf(int offset) {
     return this->classes.size();
 }
 
-int SegregatedHeap::zoneFor(int size) {
+int SegregatedHeap::zoneFor(int size) const {
     for (size_t zone = 0; zone < this->classes.size(); ++zone) {
         if (size <= this->classes[zone]) {
             return zone;
@@ -117,7 +117,7 @@ int SegregatedHeap::zoneFor(int size) {
     return this->classes.size();
 }
 
-int SegregatedHeap::allocationSize(int size) {
+int SegregatedHeap::allocationSize(int size) const {
     int zone = this->zoneFor(size);
     if (zone == (int)this->classes.size()) {
         return (size + 7) & ~7;
@@ -125,14 +125,14 @@ int SegregatedHeap::allocationSize(int size) {
     return this->classes[zone];
 }
 
-std::string SegregatedHeap::zoneLabel(int zone) {
+std::string SegregatedHeap::zoneLabel(int zone) const {
     if (zone == (int)this->classes.size()) {
         return "LARGE";
     }
     return std::to_string(this->classes[zone]);
 }
 
-int SegregatedHeap::offsetOf(MemoryBlock *block) {
+int SegregatedHeap::offsetOf(MemoryBlock *block) const {
     int offset = 0;
     MemoryBlock *aux = this->getHead();
     while (aux != nullptr && aux != block) {
@@ -236,7 +236,7 @@ void SegregatedHeap::myFree(MemoryBlock *block) {
     this->mergeInZone(block);
 }
 
-std::string SegregatedHeap::serialize() {
+std::string SegregatedHeap::serialize() const {
     std::ostringstream ss;
     MemoryBlock *aux = this->head;
     int offset = 0;

@@ -26,7 +26,7 @@ void Manager::clearHeaps() {
     }
     this->heaps.clear();
 }
-std::string Manager::serialize() {
+std::string Manager::serialize() const {
     std::ostringstream ss;
     int heapCounter = this->heaps.size();
     ss << "[";

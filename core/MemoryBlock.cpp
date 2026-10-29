@@ -75,7 +75,7 @@ void MemoryBlock::mergePrev() {
     this->getPrev()->removeCurrent();
 }
 
-std::string MemoryBlock::serialize() {
+std::string MemoryBlock::serialize() const {
     std::ostringstream ss; 
     ss << "{" << "\"id\":\"" << this << "\",\"status\":\"" << this->status << "\",\"size\":" << this->size << "}";
     return ss.str();

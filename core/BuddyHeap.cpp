@@ -70,7 +70,7 @@ void BuddyHeap::splitHalf(MemoryBlock *block) {
     block->setBuddy(right);
 }
 
-bool BuddyHeap::canMerge(MemoryBlock *block) {
+bool BuddyHeap::canMerge(MemoryBlock *block) const {
     MemoryBlock *buddy = block->getBuddy();
     return buddy != nullptr && buddy->getStatus() == Status::FREE && buddy->getSize() == block->getSize();
 }

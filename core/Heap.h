@@ -16,8 +16,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Heap& heap);
 
-    MemoryBlock *getHead() { return head; }
-    int getSize() {return size;}
+    MemoryBlock *getHead() const { return head; }
+    int getSize() const { return size; }
 
     void setHead(MemoryBlock *head) { this->head = head; }
     void setSize(int size) { this->size = (size + 7) & ~7; }
@@ -27,7 +27,7 @@ public:
     virtual MemoryBlock *myRealloc(MemoryBlock *block, int size);
     virtual void myFree(MemoryBlock *block);
 
-    virtual std::string serialize();
-    virtual std::string getType() { return "HEAP"; }
-    virtual std::string getConfig() { return ""; }
+    virtual std::string serialize() const;
+    virtual std::string getType() const { return "HEAP"; }
+    virtual std::string getConfig() const { return ""; }
 };
