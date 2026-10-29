@@ -9,7 +9,7 @@ SegregatedHeap::SegregatedHeap(int size, std::string_view config) : Heap(size) {
     this->parseConfig(config);
     this->createZones();
 };
-SegregatedHeap::SegregatedHeap(int size, char *json, std::string_view config) : Heap(size, json) {
+SegregatedHeap::SegregatedHeap(int size, std::span<const BlockInfo> blocks, std::string_view config) : Heap(size, blocks) {
     this->parseConfig(config);
 };
 
@@ -36,10 +36,13 @@ void SegregatedHeap::parseConfig(std::string_view config) {
         }
         std::string_view class_str = pair.substr(0, colon_pos);
         std::string_view zone_size_str = pair.substr(colon_pos + 1);
-        int size_class, zone_size;
+        int size_class{}, zone_size{};
         auto [ptr1, ec1] = std::from_chars(class_str.data(), class_str.data() + class_str.size(), size_class);
         auto [ptr2, ec2] = std::from_chars(zone_size_str.data(), zone_size_str.data() + zone_size_str.size(), zone_size);
-        if (ec1 != std::errc() || ec2 != std::errc() || size_class <= 0 || zone_size <= 0 || size_class % 8 != 0 || zone_size % size_class != 0 || size_class <= last_class || total_size + zone_size > this->getSize()) {
+        if (ec1 != std::errc() || ec2 != std::errc() || size_class <= 0 || zone_size <= 0 || size_class % 8 != 0 || 
+            zone_size % size_class != 0 || size_class <= last_class || total_size + zone_size > this->getSize() ||
+            ptr1 != class_str.data() + class_str.size() || ptr2 != zone_size_str.data() + zone_size_str.size()
+        ) {
             this->setDefaultConfig();
             return; 
         }

@@ -1,12 +1,15 @@
 #pragma once
 #include <ostream>
 #include <string>
+#include <span>
+#include <string_view>
+#include "BlockInfo.h"
 #include "Heap.h"
 
 class BestFitHeap : public Heap {
 public:
     BestFitHeap(int size); 
-    BestFitHeap(int size, char *json);
+    BestFitHeap(int size, std::span<const BlockInfo> blocks);
     
     friend std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap);
 
@@ -16,6 +19,6 @@ public:
     void myFree(MemoryBlock *block) override;
 
     std::string serialize() const override;
-    std::string getType() const override { return "BEST_FIT"; }
+    std::string_view getType() const override { return "BEST_FIT"; }
 };
 

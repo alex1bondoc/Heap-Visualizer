@@ -4,20 +4,20 @@ BuddyHeap::BuddyHeap(int size) : Heap(size) {
     this->createTopBlocks();
 };
 
-// The saved JSON only has sizes, so the buddy links are rebuilt
+// The saved blocks only have sizes, so the buddy links are rebuilt
 // by replaying the same splits that produced those blocks.
-BuddyHeap::BuddyHeap(int size, char *json) : Heap(size) {
+BuddyHeap::BuddyHeap(int size, std::span<const BlockInfo> blocks) : Heap(size) {
     this->createTopBlocks();
-    Heap saved(size, json);
-    MemoryBlock *target = saved.getHead();
     MemoryBlock *current = this->getHead();
-    while (target != nullptr && current != nullptr) {
-        while (current->getSize() > target->getSize()) {
+    for (const BlockInfo &target : blocks) {
+        if (current == nullptr) {
+            break;
+        }
+        while (current->getSize() > target.size) {
             this->splitHalf(current);
         }
-        current->setStatus(target->getStatus());
+        current->setStatus(target.status);
         current = current->getNext();
-        target = target->getNext();
     }
 };
 

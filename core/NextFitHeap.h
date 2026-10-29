@@ -1,6 +1,9 @@
 #pragma once
 #include <ostream>
 #include <string>
+#include <span>
+#include <string_view>
+#include "BlockInfo.h"
 #include "Heap.h"
 
 class NextFitHeap : public Heap {
@@ -8,7 +11,7 @@ private:
     MemoryBlock *last_allocated = nullptr;
 public:
     NextFitHeap(int size);
-    NextFitHeap(int size, char *json);
+    NextFitHeap(int size, std::span<const BlockInfo> blocks);
 
     friend std::ostream& operator<<(std::ostream& os, const NextFitHeap& heap);
     
@@ -19,5 +22,5 @@ public:
     void myFree(MemoryBlock *block) override;
 
     std::string serialize() const override;
-    std::string getType() const override { return "NEXT_FIT"; }
+    std::string_view getType() const override { return "NEXT_FIT"; }
 };

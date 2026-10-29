@@ -1,6 +1,8 @@
 #pragma once
+#include "BlockInfo.h"
 #include "Heap.h"
 #include <string>
+#include <span>
 #include <string_view>
 #include <vector>
 
@@ -24,7 +26,7 @@ private:
     void mergeInZone(MemoryBlock *block);
 public:
     SegregatedHeap(int size, std::string_view config);
-    SegregatedHeap(int size, char *json, std::string_view config);
+    SegregatedHeap(int size, std::span<const BlockInfo> blocks, std::string_view config);
 
     MemoryBlock *myMalloc(int size) override;
     MemoryBlock *myCalloc(int size) override;
@@ -32,6 +34,6 @@ public:
     void myFree(MemoryBlock *block) override;
 
     std::string serialize() const override;
-    std::string getType() const override { return "SEGREGATED"; }
+    std::string_view getType() const override { return "SEGREGATED"; }
     std::string getConfig() const override;
 };

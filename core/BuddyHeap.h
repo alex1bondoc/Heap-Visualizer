@@ -1,6 +1,9 @@
 #pragma once
+#include "BlockInfo.h"
 #include "Heap.h"
 #include <string>
+#include <span>
+#include <string_view>
 
 class BuddyHeap : public Heap {
 private:
@@ -12,12 +15,12 @@ private:
     MemoryBlock *mergeWithBuddy(MemoryBlock *block);
 public:
     BuddyHeap(int size);
-    BuddyHeap(int size, char *json);
+    BuddyHeap(int size, std::span<const BlockInfo> blocks);
 
     MemoryBlock *myMalloc(int size) override;
     MemoryBlock *myCalloc(int size) override;
     MemoryBlock *myRealloc(MemoryBlock *block, int size) override;
     void myFree(MemoryBlock *block) override;
 
-    std::string getType() const override { return "BUDDY"; }
+    std::string_view getType() const override { return "BUDDY"; }
 };

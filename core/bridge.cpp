@@ -6,7 +6,10 @@
 #endif
 #include "Manager.h"
 #include "HeapFactory.h"
+#include <optional>
 #include <string_view>
+#include <vector>
+#include "BlockInfo.h"
 int heap_size = 1024;
 Manager* manager = nullptr;
 
@@ -81,9 +84,13 @@ extern "C" {
         manager->getHeaps()[index]->myRealloc(toBlock(address), size);
     }
     EMSCRIPTEN_KEEPALIVE
-    const void wasmReconstructHeap(const char *type, const char *config, char *json) {
+    const void wasmReconstructHeap(const char *type, const char *config, const char *json) {
         wasmCreateManager();
-        Heap* reconstructed = HeapFactory::createHeap(std::string_view(type), heap_size, std::string_view(json), std::string_view(config));
+        std::optional<std::vector<BlockInfo>> blocks = parseBlocks(json);
+        if (!blocks) {
+            return;
+        }
+        Heap* reconstructed = HeapFactory::createHeap(type, heap_size, *blocks, config);
         if (reconstructed != nullptr) {
             manager->getHeaps().push_back(reconstructed);
         }
@@ -94,7 +101,7 @@ extern "C" {
             return;
         }
         std::vector<Heap *>& heaps = manager->getHeaps();
-        std::string type = heaps[index]->getType();
+        std::string_view type = heaps[index]->getType();
         std::string config = heaps[index]->getConfig();
         delete heaps[index];
         heaps[index] = HeapFactory::createHeap(type, heap_size, config);

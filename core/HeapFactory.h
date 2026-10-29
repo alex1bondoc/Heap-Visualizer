@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
+#include <span>
 #include <string_view>
+#include "BlockInfo.h"
 #include "Heap.h"
 
 class BestFitHeap;
@@ -20,7 +22,7 @@ enum class HeapType : int {
 class HeapFactory {
 public:
     static Heap *createHeap(std::string_view type, int size, std::string_view config);
-    static Heap *createHeap(std::string_view type, int size, char* json, std::string_view config);
+    static Heap *createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config);
 private:
     static BestFitHeap *createBestFitHeap(int size);
     static FirstFitHeap *createFirstFitHeap(int size);

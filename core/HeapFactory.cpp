@@ -49,20 +49,20 @@ Heap *HeapFactory::createHeap(std::string_view type, int size, std::string_view 
             break;
     }
 }
-Heap *HeapFactory::createHeap(std::string_view type, int size, char* json, std::string_view config) {
+Heap *HeapFactory::createHeap(std::string_view type, int size, std::span<const BlockInfo> blocks, std::string_view config) {
     HeapType t = stringToHeapType(type);
 
     switch (t) {
         case HeapType::FIRST_FIT:
-            return new FirstFitHeap(size, json);
+            return new FirstFitHeap(size, blocks);
         case HeapType::NEXT_FIT:
-            return new NextFitHeap(size, json);
+            return new NextFitHeap(size, blocks);
         case HeapType::BEST_FIT:
-            return new BestFitHeap(size, json);
+            return new BestFitHeap(size, blocks);
         case HeapType::BUDDY:
-            return new BuddyHeap(size, json);
+            return new BuddyHeap(size, blocks);
         case HeapType::SEGREGATED:
-            return new SegregatedHeap(size, json, config);
+            return new SegregatedHeap(size, blocks, config);
         default:
             return nullptr;
     }

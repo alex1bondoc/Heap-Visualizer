@@ -2,7 +2,7 @@
 #include <sstream>
 
 FirstFitHeap::FirstFitHeap(int size) : Heap(size) {};
-FirstFitHeap::FirstFitHeap(int size, char *json) : Heap(size, json) {};
+FirstFitHeap::FirstFitHeap(int size, std::span<const BlockInfo> blocks) : Heap(size, blocks) {};
 
 
 std::ostream& operator<<(std::ostream& os, const FirstFitHeap& heap) {

@@ -2,7 +2,7 @@
 #include <sstream>
 
 BestFitHeap::BestFitHeap(int size) : Heap(size) {};
-BestFitHeap::BestFitHeap(int size, char *json) : Heap(size, json) {};
+BestFitHeap::BestFitHeap(int size, std::span<const BlockInfo> blocks) : Heap(size, blocks) {};
 
 
 std::ostream& operator<<(std::ostream& os, const BestFitHeap& heap) {

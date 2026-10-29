@@ -1,6 +1,9 @@
 #pragma once
 #include <ostream>
 #include <string>
+#include <span>
+#include <string_view>
+#include "BlockInfo.h"
 #include "MemoryBlock.h"
 
 class Heap{
@@ -9,7 +12,7 @@ protected:
     MemoryBlock *head;
 public:
     Heap(int size);
-    Heap(int size, char *json);
+    Heap(int size, std::span<const BlockInfo> blocks);
     Heap (const Heap&) = delete;
     Heap& operator=(const Heap&) = delete;
     virtual ~Heap();
@@ -28,6 +31,6 @@ public:
     virtual void myFree(MemoryBlock *block);
 
     virtual std::string serialize() const;
-    virtual std::string getType() const { return "HEAP"; }
+    virtual std::string_view getType() const { return "HEAP"; }
     virtual std::string getConfig() const { return ""; }
 };

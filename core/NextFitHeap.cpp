@@ -3,7 +3,7 @@
 #include <sstream>
 
 NextFitHeap::NextFitHeap(int size) : Heap(size), last_allocated(this->head) {};
-NextFitHeap::NextFitHeap(int size, char *json) : Heap(size, json), last_allocated(this->head) {};
+NextFitHeap::NextFitHeap(int size, std::span<const BlockInfo> blocks) : Heap(size, blocks), last_allocated(this->head) {};
 
 
 std::ostream& operator<<(std::ostream& os, const NextFitHeap& heap) {
